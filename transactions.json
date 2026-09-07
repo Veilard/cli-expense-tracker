@@ -1,0 +1,37 @@
+[
+  {
+    "id": "8ccd9d38-8042-4e72-b091-dff8758594fd",
+    "date": "2026-09-06 12:47:26",
+    "amount": 15000,
+    "category": "Food",
+    "note": null
+  },
+  {
+    "id": "cff3cfd0-022f-417c-8583-3d81071830b4",
+    "date": "2026-09-06 12:47:27",
+    "amount": 15000,
+    "category": "Food",
+    "note": null
+  },
+  {
+    "id": "e32e9028-c91a-49c3-b919-541536781edc",
+    "date": "2026-09-06 12:47:46",
+    "amount": 15000,
+    "category": "Food",
+    "note": null
+  },
+  {
+    "id": "474d8fc6-27c8-48f3-9ef9-a209e23353ba",
+    "date": "2026-09-06 12:55:19",
+    "amount": 15000,
+    "category": "Food",
+    "note": null
+  },
+  {
+    "id": "bddfaf9c-43e0-487d-b558-fe715bd61d25",
+    "date": "2026-09-06 12:55:20",
+    "amount": 15000,
+    "category": "Food",
+    "note": null
+  }
+]
