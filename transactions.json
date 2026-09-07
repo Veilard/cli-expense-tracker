@@ -33,5 +33,12 @@
     "amount": 15000,
     "category": "Food",
     "note": null
+  },
+  {
+    "id": "e136c7d9-862e-45e4-8acd-da19c05b938f",
+    "date": "2026-09-07 10:38:07",
+    "amount": 15000,
+    "category": "Food",
+    "note": null
   }
 ]

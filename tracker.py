@@ -1,8 +1,9 @@
 import json
 import uuid
 from datetime import datetime
+from pathlib import Path
 
-path = "C:\\Users\\77055\\Desktop\\expense-tracker-cli\\transactions.json"
+path = f"{Path.cwd()}\\transactions.json"
 
 def load_transactions():
     try:
