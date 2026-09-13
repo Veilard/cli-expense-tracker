@@ -14,6 +14,17 @@ def load_transactions():
     except json.JSONDecodeError as error:
         raise ValueError("Invalid json file") from error
 
+def save_transactions(transactions):
+    with open(DATA_FILE, "w", encoding="utf-8") as file:
+        json.dump(
+            transactions,
+            file,
+            ensure_ascii=False,
+            indent=2,
+            default=str,
+        )
+
+### ADD
 def add_transaction(transactions, amount, category, note=None):
     # Category validation
     if not isinstance(category, str):
@@ -25,7 +36,7 @@ def add_transaction(transactions, amount, category, note=None):
         raise ValueError("Invalid category")
 
     # Amount validation
-    if not type(amount) is int or amount <= 0:
+    if type(amount) is not int or amount <= 0:
         raise ValueError("Invalid amount")
 
     transaction = {
@@ -39,17 +50,20 @@ def add_transaction(transactions, amount, category, note=None):
     transactions.append(transaction)
     return transaction
 
-def save_transactions(transactions):
-    with open(DATA_FILE, "w", encoding="utf-8") as file:
-        json.dump(
-            transactions,
-            file,
-            ensure_ascii=False,
-            indent=2,
-            default=str,
-        )
+### DELETE
+def delete_transaction(transactions: list, category: str) -> dict:
+    category = category.strip().lower()
+    if not category:
+        raise ValueError("Category cannot be empty")
 
+    matches = [transaction for transaction in transactions if transaction["category"] == category]
+    if not matches:
+        f"No transactions with category '{category}' exists"
 
+    transactions.remove(removed_transaction)
+    return removed_transaction
+
+### SUMMARIZE
 def summarize_by_category(transactions):
     totals_by_category = {}
 
@@ -67,7 +81,6 @@ def summarize_by_category(transactions):
             reverse=True,
         )
     )
-
 
 def calculate_total(transactions):
     return sum(transaction["amount"] for transaction in transactions)
