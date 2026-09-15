@@ -67,18 +67,39 @@ def find_transactions(transactions: list, category:str) -> list:
 
 ### FILTER TRANSACTIONS
 
-def filter_transactions(transactions: list, category: str = None, from_date=None, to_date=None) -> list:
+def filter_transactions(
+    transactions: list,
+    category: str = None,
+    from_date=None,
+    to_date=None,
+) -> list:
 
     if category:
-        transactions = [transaction for transaction in transactions if transaction["category"] == category]
-    if to_date:
-        transactions = [transaction for transaction in transactions if
-                        datetime.strptime(transaction["date"].split(" ")[0], "%Y-%m-%d") <= datetime.strptime(
-                           to_date, "%Y-%m-%d")]
+        category = category.strip().lower()
+
+        transactions = [
+            transaction
+            for transaction in transactions
+            if transaction["category"].strip().lower() == category
+        ]
+
     if from_date:
-        transactions = [transaction for transaction in transactions if
-                        datetime.strptime(transaction["date"].split(" ")[0], "%Y-%m-%d") >= datetime.strptime(
-                            from_date, "%Y-%m-%d")]
+        from_date = datetime.strptime(from_date, "%Y-%m-%d").date()
+
+        transactions = [
+            transaction
+            for transaction in transactions
+            if datetime.fromisoformat(transaction["date"]).date() >= from_date
+        ]
+
+    if to_date:
+        to_date = datetime.strptime(to_date, "%Y-%m-%d").date()
+
+        transactions = [
+            transaction
+            for transaction in transactions
+            if datetime.fromisoformat(transaction["date"]).date() <= to_date
+        ]
 
     return transactions
 

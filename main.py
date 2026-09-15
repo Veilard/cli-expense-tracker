@@ -77,9 +77,10 @@ if __name__ == '__main__':
                   )
 
         elif args.command == "list":
+            transactions = filter_transactions(transactions, args.category, args.from_date, args.to_date)
             if not transactions:
                 print("No transactions found.")
-            transactions = filter_transactions(transactions, args.category, args.from_date, args.to_date)
+                
             for elem in transactions:
                 print(
                     f"{elem["date"]} || "
