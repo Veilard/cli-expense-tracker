@@ -2,6 +2,8 @@ import json
 import uuid
 from datetime import datetime
 from pathlib import Path
+import questionary
+import ast
 
 DATA_FILE = Path(__file__).resolve().parent / 'transactions.json'
 
@@ -50,17 +52,36 @@ def add_transaction(transactions, amount, category, note=None):
     transactions.append(transaction)
     return transaction
 
-### DELETE
-def delete_transaction(transactions: list, category: str) -> dict:
+### FIND TRANSACTIONS
+def find_transactions(transactions: list, category:str) -> list:
     category = category.strip().lower()
     if not category:
         raise ValueError("Category cannot be empty")
 
-    matches = [transaction for transaction in transactions if transaction["category"] == category]
+    matches = [transaction for transaction in transactions if transaction["category"].strip().lower() == category]
     if not matches:
         f"No transactions with category '{category}' exists"
 
-    transactions.remove(removed_transaction)
+    return matches
+
+
+### DELETE
+def select_and_delete_transaction(transactions, matches: list) -> dict:
+    removed_transaction = questionary.select(
+        "Select a transaction to remove",
+        choices=[str(match) for match in matches]
+    ).ask()
+    removed_transaction = ast.literal_eval(removed_transaction)
+
+    try:
+        transactions.remove(removed_transaction)
+        print(f"Removed {removed_transaction['id']} "
+              f"|| {removed_transaction['date']} "
+              f"|| {removed_transaction['category']} "
+              f"|| {removed_transaction['amount']}"
+        )
+    except ValueError as e:
+        print(f"Error: {e}")
     return removed_transaction
 
 ### SUMMARIZE

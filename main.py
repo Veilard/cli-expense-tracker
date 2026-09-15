@@ -2,7 +2,8 @@ import argparse
 
 from tracker import (
     add_transaction,
-    delete_transaction,
+    find_transactions,
+    select_and_delete_transaction,
     calculate_total,
     load_transactions,
     save_transactions,
@@ -38,14 +39,9 @@ if __name__ == '__main__':
             )
 
         elif args.command == "delete":
-            removed_transaction = delete_transaction(transactions, args.category)
+            matches = find_transactions(transactions, args.category)
+            select_and_delete_transaction(transactions, matches)
             save_transactions(transactions)
-            print(
-                "Transaction deleted: "
-                f"{removed_transaction["id"]} — {removed_transaction['category']} — {removed_transaction['amount']:_} ₸"
-                .replace("_", " ")
-            )
-
 
         elif args.command == "list":
             if not transactions:
