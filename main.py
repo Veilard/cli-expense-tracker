@@ -8,6 +8,7 @@ from questionary import Choice
 from tracker import (
     add_transaction,
     find_transactions,
+    filter_transactions,
     delete_transaction,
     calculate_total,
     load_transactions,
@@ -76,27 +77,16 @@ if __name__ == '__main__':
                   )
 
         elif args.command == "list":
-            display = []
-            if args.category:
-                transactions = [transaction for transaction in transactions if transaction["category"] == args.category]
-            if args.to_date:
-                transactions = [transaction for transaction in transactions if datetime.strptime(transaction["date"].split(" ")[0], "%Y-%m-%d") <= datetime.strptime(args.to_date, "%Y-%m-%d")]
-            if args.from_date:
-                transactions = [transaction for transaction in transactions if datetime.strptime(transaction["date"].split(" ")[0], "%Y-%m-%d") >= datetime.strptime(args.from_date, "%Y-%m-%d")]
             if not transactions:
                 print("No transactions found.")
-
-            else:
-                for elem in transactions:
-                    display.append(
-                        f"{elem["date"]} || "
-                        f"{elem["category"]} || "
-                        f"{elem["amount"]:_} ||".replace("_", " ") +
-                        f"{elem["note"] if elem["note"] else ""}"
-                    )
-
-            for x in display:
-                print(x)
+            transactions = filter_transactions(transactions, args.category, args.from_date, args.to_date)
+            for elem in transactions:
+                print(
+                    f"{elem["date"]} || "
+                    f"{elem["category"]} || "
+                    f"{elem["amount"]:_} ||".replace("_", " ") +
+                    f"{elem["note"] if elem["note"] else ""}"
+                )
 
         elif args.command == "summary":
             for category, total in summarize_by_category(transactions).items():
