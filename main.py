@@ -1,9 +1,12 @@
 import argparse
+import questionary
+
+from questionary import Choice
 
 from tracker import (
     add_transaction,
     find_transactions,
-    select_and_delete_transaction,
+    delete_transaction,
     calculate_total,
     load_transactions,
     save_transactions,
@@ -39,9 +42,32 @@ if __name__ == '__main__':
             )
 
         elif args.command == "delete":
+
             matches = find_transactions(transactions, args.category)
-            select_and_delete_transaction(transactions, matches)
+            removed_trans_id = questionary.select(
+                "Select a transaction to remove",
+                choices=[
+                    Choice(
+                        title=(
+                            f"{match['date']} | "
+                            f"{match['category']} | "
+                            f"{match['amount']:_} ₸ | "
+                            f"{match['note'] or ''}"
+                        ).replace("_", " "),
+                        value=match["id"],
+                    )
+                    for match in matches
+                ]
+            ).ask()
+
+            removed_transaction = delete_transaction(transactions, removed_trans_id)
             save_transactions(transactions)
+
+            print(f"Removed {removed_transaction['id']} "
+                  f"|| {removed_transaction['date']} "
+                  f"|| {removed_transaction['category']} "
+                  f"|| {removed_transaction['amount']}"
+                  )
 
         elif args.command == "list":
             if not transactions:

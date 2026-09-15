@@ -2,8 +2,7 @@ import json
 import uuid
 from datetime import datetime
 from pathlib import Path
-import questionary
-import ast
+
 
 DATA_FILE = Path(__file__).resolve().parent / 'transactions.json'
 
@@ -43,7 +42,7 @@ def add_transaction(transactions, amount, category, note=None):
 
     transaction = {
         "id" : str(uuid.uuid4()),
-        "date" : datetime.now().replace(microsecond=0),
+        "date" : datetime.now().isoformat(timespec="seconds"),
         "amount" : amount,
         "category" : category,
         "note" : note
@@ -60,29 +59,22 @@ def find_transactions(transactions: list, category:str) -> list:
 
     matches = [transaction for transaction in transactions if transaction["category"].strip().lower() == category]
     if not matches:
-        f"No transactions with category '{category}' exists"
+        raise ValueError(
+            f"No transactions with category '{category}' exist"
+        )
 
     return matches
 
 
 ### DELETE
-def select_and_delete_transaction(transactions, matches: list) -> dict:
-    removed_transaction = questionary.select(
-        "Select a transaction to remove",
-        choices=[str(match) for match in matches]
-    ).ask()
-    removed_transaction = ast.literal_eval(removed_transaction)
+def delete_transaction(transactions, trans_id) -> dict:
 
-    try:
-        transactions.remove(removed_transaction)
-        print(f"Removed {removed_transaction['id']} "
-              f"|| {removed_transaction['date']} "
-              f"|| {removed_transaction['category']} "
-              f"|| {removed_transaction['amount']}"
-        )
-    except ValueError as e:
-        print(f"Error: {e}")
-    return removed_transaction
+    for transaction in transactions:
+        if transaction["id"] == trans_id:
+            transactions.remove(transaction)
+            return transaction
+
+    raise ValueError(f"Transaction with id {trans_id} does not exist")
 
 ### SUMMARIZE
 def summarize_by_category(transactions):
