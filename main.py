@@ -1,4 +1,6 @@
 import argparse
+from datetime import datetime
+
 import questionary
 
 from questionary import Choice
@@ -24,6 +26,10 @@ delete_parser = subparser.add_parser("delete")
 delete_parser.add_argument("category", type=str)
 
 list_parser = subparser.add_parser("list")
+list_parser.add_argument("--category", type=str)
+list_parser.add_argument("--from_date", type=str)
+list_parser.add_argument("--to_date", type=str)
+
 summary_parser = subparser.add_parser("summary")
 
 if __name__ == '__main__':
@@ -70,16 +76,27 @@ if __name__ == '__main__':
                   )
 
         elif args.command == "list":
+            display = []
+            if args.category:
+                transactions = [transaction for transaction in transactions if transaction["category"] == args.category]
+            if args.to_date:
+                transactions = [transaction for transaction in transactions if datetime.strptime(transaction["date"].split(" ")[0], "%Y-%m-%d") <= datetime.strptime(args.to_date, "%Y-%m-%d")]
+            if args.from_date:
+                transactions = [transaction for transaction in transactions if datetime.strptime(transaction["date"].split(" ")[0], "%Y-%m-%d") >= datetime.strptime(args.from_date, "%Y-%m-%d")]
             if not transactions:
                 print("No transactions found.")
+
             else:
                 for elem in transactions:
-                    print(
+                    display.append(
                         f"{elem["date"]} || "
                         f"{elem["category"]} || "
-                        f"{elem["amount"]:_} ||".replace("_", " "),
+                        f"{elem["amount"]:_} ||".replace("_", " ") +
                         f"{elem["note"] if elem["note"] else ""}"
                     )
+
+            for x in display:
+                print(x)
 
         elif args.command == "summary":
             for category, total in summarize_by_category(transactions).items():
