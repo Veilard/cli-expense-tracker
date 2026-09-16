@@ -1,4 +1,8 @@
-from tracker import (calculate_total, add_transaction)
+from tracker import (
+    calculate_total,
+    add_transaction,
+    filter_transactions
+)
 
 def test_calculate_total():
     transactions = [
@@ -27,3 +31,27 @@ def test_add_transaction():
     assert transaction["category"] == "food"
     assert transaction["note"] == "Lunch"
     assert len(transactions) == 1
+
+def test_filter_transactions():
+    transactions = [
+        {
+            "category": "food",
+            "date": "2026-09-10T12:00:00",
+        },
+        {
+            "category": "taxi",
+            "date": "2026-09-11T12:00:00",
+        },
+        {
+            "category": "food",
+            "date": "2026-09-12T12:00:00",
+        },
+    ]
+
+    result = filter_transactions(
+        transactions,
+        category="FOOD"
+    )
+
+    assert len(result) == 2
+    assert all(transaction["category"] == "food" for transaction in result)

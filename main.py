@@ -1,10 +1,7 @@
 import argparse
-from datetime import datetime
-
 import questionary
 
 from questionary import Choice
-
 from tracker import (
     add_transaction,
     find_transactions,

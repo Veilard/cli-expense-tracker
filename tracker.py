@@ -21,8 +21,7 @@ def save_transactions(transactions):
             transactions,
             file,
             ensure_ascii=False,
-            indent=2,
-            default=str,
+            indent=2
         )
 
 ### ADD
