@@ -5,7 +5,6 @@ from tracker import (
     add_transaction,
     filter_transactions
 )
-from datetime import datetime
 
 def test_calculate_total():
     transactions = [
@@ -35,51 +34,37 @@ def test_add_transaction():
     assert transaction["note"] == "Lunch"
     assert len(transactions) == 1
 
-def test_add_transaction_reject_negative_amount():
+@pytest.mark.parametrize("amount", [-5000, 0])
+def test_add_transaction_rejects_invalid_amount(amount):
     transactions = []
 
     with pytest.raises(ValueError, match="Invalid amount"):
         add_transaction(
             transactions,
-            -5000,
+            amount,
             "food"
         )
 
-def test_add_transaction_zero_amount():
-    transactions = []
-
-    with pytest.raises(ValueError, match="Invalid amount"):
-        add_transaction(
-            transactions,
-            0,
-            "food"
-        )
-
-def test_add_transaction_rejects_empty_category():
+@pytest.mark.parametrize("cat", ["   ", "", 123])
+def test_add_transaction_rejects_invalid_category():
     transactions = []
 
     with pytest.raises(ValueError, match="Invalid category"):
         add_transaction(
             transactions,
             5000,
-            ""
+            cat
         )
 
-def test_filter_transactions_by_category():
-    transactions = [
-        {
-            "category": "food",
-            "date": "2026-09-10T12:00:00",
-        },
-        {
-            "category": "taxi",
-            "date": "2026-09-11T12:00:00",
-        },
-        {
-            "category": "food",
-            "date": "2026-09-12T12:00:00",
-        },
+@pytest.fixture
+def transactions():
+    return [
+        {"category": "food","date": "2026-09-10T12:00:00"},
+        {"category": "taxi","date": "2026-09-11T12:00:00"},
+        {"category": "food","date": "2026-09-12T12:00:00"}
     ]
+
+def test_filter_transactions_by_category():
 
     result = filter_transactions(
         transactions,
@@ -91,21 +76,6 @@ def test_filter_transactions_by_category():
 
 
 def test_filter_transactions_from_date():
-    transactions = [
-        {
-            "category": "food",
-            "date": "2026-09-10T12:00:00",
-        },
-        {
-            "category": "taxi",
-            "date": "2026-09-11T12:00:00",
-        },
-        {
-            "category": "food",
-            "date": "2026-09-12T12:00:00",
-        },
-    ]
-
     result = filter_transactions(
         transactions,
         from_date="2026-09-11"
