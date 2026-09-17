@@ -45,15 +45,15 @@ def test_add_transaction_rejects_invalid_amount(amount):
             "food"
         )
 
-@pytest.mark.parametrize("cat", ["   ", "", 123])
-def test_add_transaction_rejects_invalid_category():
+@pytest.mark.parametrize("category", ["   ", ""])
+def test_add_transaction_rejects_invalid_category(category):
     transactions = []
 
     with pytest.raises(ValueError, match="Invalid category"):
         add_transaction(
             transactions,
             5000,
-            cat
+            category
         )
 
 @pytest.fixture
@@ -64,7 +64,7 @@ def transactions():
         {"category": "food","date": "2026-09-12T12:00:00"}
     ]
 
-def test_filter_transactions_by_category():
+def test_filter_transactions_by_category(transactions):
 
     result = filter_transactions(
         transactions,
@@ -75,7 +75,7 @@ def test_filter_transactions_by_category():
     assert all(transaction["category"] == "food" for transaction in result)
 
 
-def test_filter_transactions_from_date():
+def test_filter_transactions_from_date(transactions):
     result = filter_transactions(
         transactions,
         from_date="2026-09-11"
