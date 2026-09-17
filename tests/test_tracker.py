@@ -3,8 +3,35 @@ import pytest
 from tracker import (
     calculate_total,
     add_transaction,
-    filter_transactions
+    filter_transactions,
+    delete_transaction
 )
+# ------------------------------------------------FIXTURES-------------------------------------------------------------
+
+@pytest.fixture
+def transactions():
+    return [
+        {"category": "food","date": "2026-09-10T12:00:00"},
+        {"category": "taxi","date": "2026-09-11T12:00:00"},
+        {"category": "food","date": "2026-09-12T12:00:00"}
+    ]
+
+@pytest.fixture
+def transaction_with_ids():
+    return [
+        {
+            "id": "abc",
+            "category": "food",
+            "amount": 5000,
+        },
+        {
+            "id": "def",
+            "category": "taxi",
+            "amount": 3000,
+        },
+    ]
+
+# ------------------------------------------------TESTS-------------------------------------------------------------
 
 def test_calculate_total():
     transactions = [
@@ -28,11 +55,25 @@ def test_add_transaction():
         "Lunch"
     )
 
-
     assert transaction["amount"] == 5000
     assert transaction["category"] == "food"
     assert transaction["note"] == "Lunch"
     assert len(transactions) == 1
+
+
+def test_delete_transaction(transaction_with_ids):
+    removed_transaction = delete_transaction(transaction_with_ids, "abc")
+
+    assert removed_transaction["id"] == "abc"
+    assert transaction_with_ids[0]["id"] == "def"
+
+
+def test_delete_transaction_rejects_unknown_trans_id(transaction_with_ids):
+    trans_id = "unknown"
+
+    with pytest.raises(ValueError, match=f"Transaction with id {trans_id} does not exist"):
+        delete_transaction(transaction_with_ids, trans_id)
+
 
 @pytest.mark.parametrize("amount", [-5000, 0])
 def test_add_transaction_rejects_invalid_amount(amount):
@@ -45,6 +86,7 @@ def test_add_transaction_rejects_invalid_amount(amount):
             "food"
         )
 
+
 @pytest.mark.parametrize("category", ["   ", ""])
 def test_add_transaction_rejects_invalid_category(category):
     transactions = []
@@ -56,16 +98,8 @@ def test_add_transaction_rejects_invalid_category(category):
             category
         )
 
-@pytest.fixture
-def transactions():
-    return [
-        {"category": "food","date": "2026-09-10T12:00:00"},
-        {"category": "taxi","date": "2026-09-11T12:00:00"},
-        {"category": "food","date": "2026-09-12T12:00:00"}
-    ]
 
 def test_filter_transactions_by_category(transactions):
-
     result = filter_transactions(
         transactions,
         category="  FOOD  "
