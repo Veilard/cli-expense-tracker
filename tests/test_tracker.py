@@ -1,12 +1,11 @@
 import pytest
 import tracker
-from pathlib import Path
 
 from tracker import (
-    calculate_total,
     add_transaction,
+    delete_transaction,
     filter_transactions,
-    delete_transaction
+    calculate_total
 )
 # ------------------------------------------------FIXTURES-------------------------------------------------------------
 
@@ -91,14 +90,32 @@ def test_save_transactions(tmp_path, monkeypatch):
     ]
 
     tracker.save_transactions(transactions)
+
+    loaded = tracker.load_transactions()
+
     assert test_file.exists()
+    assert loaded == transactions
+
+def test_load_empty_transactions(tmp_path, monkeypatch):
+    test_file = tmp_path / "transactions.json"
+
+    monkeypatch.setattr(
+        tracker,
+        "DATA_FILE",
+        test_file
+    )
+
+    loaded = tracker.load_transactions()
+    assert loaded == []
+
+
 
 
 def test_delete_transaction_rejects_unknown_trans_id(transactions_with_ids):
     trans_id = "unknown"
 
     with pytest.raises(ValueError, match=f"Transaction with id {trans_id} does not exist"):
-        delete_transaction(transactions_with_ids, trans_id)
+        tracker.delete_transaction(transactions_with_ids, trans_id)
 
 
 @pytest.mark.parametrize("amount", [-5000, 0])
@@ -106,7 +123,7 @@ def test_add_transaction_rejects_invalid_amount(amount):
     transactions = []
 
     with pytest.raises(ValueError, match="Invalid amount"):
-        add_transaction(
+        tracker.add_transaction(
             transactions,
             amount,
             "food"
