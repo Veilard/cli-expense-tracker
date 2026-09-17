@@ -1,4 +1,6 @@
 import pytest
+import tracker
+from pathlib import Path
 
 from tracker import (
     calculate_total,
@@ -17,7 +19,7 @@ def transactions():
     ]
 
 @pytest.fixture
-def transaction_with_ids():
+def transactions_with_ids():
     return [
         {
             "id": "abc",
@@ -61,18 +63,42 @@ def test_add_transaction():
     assert len(transactions) == 1
 
 
-def test_delete_transaction(transaction_with_ids):
-    removed_transaction = delete_transaction(transaction_with_ids, "abc")
+def test_delete_transaction(transactions_with_ids):
+    removed_transaction = delete_transaction(transactions_with_ids, "abc")
 
     assert removed_transaction["id"] == "abc"
-    assert transaction_with_ids[0]["id"] == "def"
+    assert transactions_with_ids[0]["id"] == "def"
+    assert len(transactions_with_ids) == 1
 
 
-def test_delete_transaction_rejects_unknown_trans_id(transaction_with_ids):
+def test_save_transactions(tmp_path, monkeypatch):
+    test_file = tmp_path / "transactions.json"
+
+    monkeypatch.setattr(
+        tracker,
+        "DATA_FILE",
+        test_file
+    )
+
+    transactions = [
+        {
+            "id": "abc",
+            "date": "2026-09-17T12:00:00",
+            "amount": 5000,
+            "category": "food",
+            "note": "lunch",
+        }
+    ]
+
+    tracker.save_transactions(transactions)
+    assert test_file.exists()
+
+
+def test_delete_transaction_rejects_unknown_trans_id(transactions_with_ids):
     trans_id = "unknown"
 
     with pytest.raises(ValueError, match=f"Transaction with id {trans_id} does not exist"):
-        delete_transaction(transaction_with_ids, trans_id)
+        delete_transaction(transactions_with_ids, trans_id)
 
 
 @pytest.mark.parametrize("amount", [-5000, 0])
