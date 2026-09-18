@@ -42,7 +42,7 @@ if __name__ == '__main__':
             save_transactions(transactions)
             print(
                 "Transaction added: "
-                f"{transaction['category']} — {transaction['amount']:_} ₸"
+                f"{transaction.category} — {transaction.amount:_} ₸"
                 .replace("_", " ")
             )
 

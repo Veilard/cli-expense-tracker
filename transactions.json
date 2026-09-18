@@ -26,5 +26,26 @@
     "amount": 25000,
     "category": "пожрать",
     "note": "дорого"
+  },
+  {
+    "id": "b18968dd-4eec-44d2-91ed-f2d4d32a0224",
+    "date": "2026-09-18T18:14:34",
+    "amount": 5000,
+    "category": "food",
+    "note": null
+  },
+  {
+    "id": "9b8ff04b-0574-4858-b0f0-12df19e809d1",
+    "date": "2026-09-18T18:15:09",
+    "amount": 5000,
+    "category": "food",
+    "note": null
+  },
+  {
+    "id": "655104f7-936d-469c-9e4d-a8492a5b7a39",
+    "date": "2026-09-18T18:15:18",
+    "amount": 5000,
+    "category": "food",
+    "note": null
   }
 ]

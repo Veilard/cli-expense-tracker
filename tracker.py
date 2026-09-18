@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 from models import Transaction
+from dataclasses import asdict
 
 DATA_FILE = Path(__file__).resolve().parent / 'transactions.json'
 
@@ -46,8 +47,9 @@ def add_transaction(transactions, amount, category, note=None):
         category=category,
         note=note
     )
-
-    transactions.append(transaction)
+    #print(transaction)
+    transactions.append(asdict(transaction))
+    #print(transactions)
     return transaction
 
 ### FIND TRANSACTIONS
@@ -79,7 +81,7 @@ def filter_transactions(
         transactions = [
             transaction
             for transaction in transactions
-            if transaction["category"].strip().lower() == category
+            if transaction.category.strip().lower() == category
         ]
 
     if from_date:
@@ -88,7 +90,7 @@ def filter_transactions(
         transactions = [
             transaction
             for transaction in transactions
-            if datetime.fromisoformat(transaction["date"]).date() >= from_date
+            if datetime.fromisoformat(transaction.date).date() >= from_date
         ]
 
     if to_date:
@@ -97,7 +99,7 @@ def filter_transactions(
         transactions = [
             transaction
             for transaction in transactions
-            if datetime.fromisoformat(transaction["date"]).date() <= to_date
+            if datetime.fromisoformat(transaction.date).date() <= to_date
         ]
 
     return transactions
@@ -106,7 +108,7 @@ def filter_transactions(
 def delete_transaction(transactions, trans_id) -> dict:
 
     for transaction in transactions:
-        if transaction["id"] == trans_id:
+        if transaction.id == trans_id:
             transactions.remove(transaction)
             return transaction
 
@@ -117,10 +119,10 @@ def summarize_by_category(transactions):
     totals_by_category = {}
 
     for transaction in transactions:
-        category = transaction["category"].strip().lower()
+        category = transaction.category.strip().lower()
         totals_by_category[category] = (
             totals_by_category.get(category, 0)
-            + transaction["amount"]
+            + transaction.amount
         )
 
     return dict(
@@ -132,4 +134,4 @@ def summarize_by_category(transactions):
     )
 
 def calculate_total(transactions):
-    return sum(transaction["amount"] for transaction in transactions)
+    return sum(transaction.amount for transaction in transactions)
