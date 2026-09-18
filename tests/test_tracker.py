@@ -7,7 +7,8 @@ from tracker import (
     filter_transactions,
     calculate_total
 )
-# ------------------------------------------------FIXTURES-------------------------------------------------------------
+from unittest.mock import patch
+# =====================================================FIXTURES=====================================================
 
 @pytest.fixture
 def transactions():
@@ -32,7 +33,7 @@ def transactions_with_ids():
         },
     ]
 
-# ------------------------------------------------TESTS-------------------------------------------------------------
+# =====================================================TESTS===========================================================
 
 def test_calculate_total():
     transactions = [
@@ -56,10 +57,26 @@ def test_add_transaction():
         "Lunch"
     )
 
-    assert transaction["amount"] == 5000
-    assert transaction["category"] == "food"
-    assert transaction["note"] == "Lunch"
+    assert transaction.amount == 5000
+    assert transaction.category == "food"
+    assert transaction.note == "Lunch"
     assert len(transactions) == 1
+
+
+def test_add_transaction_calls_uuid_and_is_called_once():
+    transactions = []
+
+    with patch("tracker.uuid.uuid4", return_value="fixed_id") as mock_uuid:
+        transaction = tracker.add_transaction(
+            transactions,
+            5000,
+            "food"
+        )
+
+    print(mock_uuid.call_args)
+
+    assert transaction.id == "fixed_id"
+    mock_uuid.assert_called_once()
 
 
 def test_delete_transaction(transactions_with_ids):

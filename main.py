@@ -12,6 +12,7 @@ from tracker import (
     save_transactions,
     summarize_by_category,
 )
+
 parser = argparse.ArgumentParser(description="Track expense tracker")
 subparser = parser.add_subparsers(dest="command", required=True)
 

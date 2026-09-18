@@ -2,7 +2,7 @@ import json
 import uuid
 from datetime import datetime
 from pathlib import Path
-
+from models import Transaction
 
 DATA_FILE = Path(__file__).resolve().parent / 'transactions.json'
 
@@ -39,13 +39,13 @@ def add_transaction(transactions, amount, category, note=None):
     if type(amount) is not int or amount <= 0:
         raise ValueError("Invalid amount")
 
-    transaction = {
-        "id" : str(uuid.uuid4()),
-        "date" : datetime.now().isoformat(timespec="seconds"),
-        "amount" : amount,
-        "category" : category,
-        "note" : note
-    }
+    transaction = Transaction(
+        id=str(uuid.uuid4()),
+        date=datetime.now().isoformat(timespec="seconds"),
+        amount=amount,
+        category=category,
+        note=note
+    )
 
     transactions.append(transaction)
     return transaction
