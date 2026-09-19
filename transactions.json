@@ -1,21 +1,28 @@
 [
   {
-    "id": "22c0b79e-7c42-4607-8f96-3ac566ea5b12",
-    "date": "2026-09-19T17:59:32",
+    "id": "72187d56-b96d-4a7f-bf60-5c2f993b3a4a",
+    "date": "2026-09-19T18:11:15",
     "amount": 5000,
     "category": "food",
     "note": null
   },
   {
-    "id": "72c6598e-7293-43e5-a2ab-5887a4719e6b",
-    "date": "2026-09-19T18:00:41",
-    "amount": 5000,
-    "category": "food",
+    "id": "6638b293-c740-41ba-b218-ee9a23aa08d6",
+    "date": "2026-09-19T18:13:18",
+    "amount": 25000,
+    "category": "internet",
     "note": null
   },
   {
-    "id": "48373fd2-2158-4c72-a8a3-6c8f4abbfeb5",
-    "date": "2026-09-19T18:00:54",
+    "id": "f1612f43-2649-4053-9735-d4dbcfff314f",
+    "date": "2026-09-19T18:13:31",
+    "amount": 25000,
+    "category": "internet",
+    "note": null
+  },
+  {
+    "id": "7311e34c-a487-4848-a68e-c5ae267797ff",
+    "date": "2026-09-19T18:16:34",
     "amount": 5000,
     "category": "food",
     "note": null

@@ -54,12 +54,12 @@ if __name__ == '__main__':
                 choices=[
                     Choice(
                         title=(
-                            f"{match['date']} | "
-                            f"{match['category']} | "
-                            f"{match['amount']:_} ₸ | "
-                            f"{match['note'] or ''}"
+                            f"{match.date} | "
+                            f"{match.category} | "
+                            f"{match.amount:_} ₸ | "
+                            f"{match.note or ''}"
                         ).replace("_", " "),
-                        value=match["id"],
+                        value=match.id,
                     )
                     for match in matches
                 ]
@@ -68,10 +68,10 @@ if __name__ == '__main__':
             removed_transaction = delete_transaction(transactions, removed_trans_id)
             save_transactions(transactions)
 
-            print(f"Removed {removed_transaction['id']} "
-                  f"|| {removed_transaction['date']} "
-                  f"|| {removed_transaction['category']} "
-                  f"|| {removed_transaction['amount']}"
+            print(f"Removed {removed_transaction.id} "
+                  f"|| {removed_transaction.date} "
+                  f"|| {removed_transaction.category} "
+                  f"|| {removed_transaction.amount}"
                   )
 
         elif args.command == "list":
@@ -79,12 +79,13 @@ if __name__ == '__main__':
             if not transactions:
                 print("No transactions found.")
                 
-            for elem in transactions:
+            for transaction in transactions:
                 print(
-                    f"{elem["date"]} || "
-                    f"{elem["category"]} || "
-                    f"{elem["amount"]:_} ||".replace("_", " ") +
-                    f"{elem["note"] if elem["note"] else ""}"
+                    f"{transaction.date} || "
+                    f"{transaction.category} || "
+                    f"{transaction.category} || "
+                    f"{transaction.amount:_} ||".replace("_", " ") +
+                    f"{transaction.note if transaction.note else ""}"
                 )
 
         elif args.command == "summary":

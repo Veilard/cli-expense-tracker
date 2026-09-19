@@ -1,5 +1,6 @@
 import pytest
 import tracker
+from models import Transaction
 
 from tracker import (
     add_transaction,
@@ -13,9 +14,12 @@ from unittest.mock import patch
 @pytest.fixture
 def transactions():
     return [
-        {"category": "food","date": "2026-09-10T12:00:00"},
-        {"category": "taxi","date": "2026-09-11T12:00:00"},
-        {"category": "food","date": "2026-09-12T12:00:00"}
+        Transaction(250000, 'phone'),
+        Transaction(10000, 'recreation'),
+        Transaction(5000, 'food')
+        # {"category": "food","date": "2026-09-10T12:00:00"},
+        # {"category": "taxi","date": "2026-09-11T12:00:00"},
+        # {"category": "food","date": "2026-09-12T12:00:00"}
     ]
 
 @pytest.fixture
@@ -36,12 +40,6 @@ def transactions_with_ids():
 # =====================================================TESTS===========================================================
 
 def test_calculate_total():
-    transactions = [
-        {"amount": 1000},
-        {"amount": 2500},
-        {"amount": 500},
-    ]
-
     result = calculate_total(transactions)
 
     assert result == 4000

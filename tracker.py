@@ -18,10 +18,11 @@ def load_transactions():
         raise ValueError("Invalid json file") from error
 
 def save_transactions(transactions):
+    data = [asdict(transaction) for transaction in transactions]
+
     with open(DATA_FILE, "w", encoding="utf-8") as file:
-        transactions = [transaction.__dict__ for transaction in transactions]
         json.dump(
-            transactions,
+            data,
             file,
             ensure_ascii=False,
             indent=2
@@ -51,7 +52,7 @@ def add_transaction(transactions, amount, category, note=None):
     )
     #print(transaction)
     transactions.append(transaction)
-    print(transactions)
+    #print(transactions)
     return transaction
 
 ### FIND TRANSACTIONS
@@ -136,4 +137,5 @@ def summarize_by_category(transactions):
     )
 
 def calculate_total(transactions):
+    print(transactions)
     return sum(transaction.amount for transaction in transactions)
