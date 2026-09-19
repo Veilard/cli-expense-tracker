@@ -1,49 +1,21 @@
 [
   {
-    "id": "9303aad3-4506-4194-be1f-d4dd28636ec0",
-    "date": "2026-09-11 08:35:44",
-    "amount": 15000,
-    "category": "drugs",
-    "note": null
-  },
-  {
-    "id": "47f86eda-afa5-43d1-af76-dbba03853506",
-    "date": "2026-09-11 08:35:46",
-    "amount": 15000,
-    "category": "drugs",
-    "note": null
-  },
-  {
-    "id": "d25faf2d-143c-42c6-a135-0f6f38a46bb3",
-    "date": "2026-09-11 08:36:37",
-    "amount": 150000,
-    "category": "guns",
-    "note": null
-  },
-  {
-    "id": "44b41ae9-f3b0-41fa-8b76-86f30619336f",
-    "date": "2026-09-12 14:09:54",
-    "amount": 25000,
-    "category": "пожрать",
-    "note": "дорого"
-  },
-  {
-    "id": "b18968dd-4eec-44d2-91ed-f2d4d32a0224",
-    "date": "2026-09-18T18:14:34",
+    "id": "22c0b79e-7c42-4607-8f96-3ac566ea5b12",
+    "date": "2026-09-19T17:59:32",
     "amount": 5000,
     "category": "food",
     "note": null
   },
   {
-    "id": "9b8ff04b-0574-4858-b0f0-12df19e809d1",
-    "date": "2026-09-18T18:15:09",
+    "id": "72c6598e-7293-43e5-a2ab-5887a4719e6b",
+    "date": "2026-09-19T18:00:41",
     "amount": 5000,
     "category": "food",
     "note": null
   },
   {
-    "id": "655104f7-936d-469c-9e4d-a8492a5b7a39",
-    "date": "2026-09-18T18:15:18",
+    "id": "48373fd2-2158-4c72-a8a3-6c8f4abbfeb5",
+    "date": "2026-09-19T18:00:54",
     "amount": 5000,
     "category": "food",
     "note": null

@@ -10,7 +10,8 @@ DATA_FILE = Path(__file__).resolve().parent / 'transactions.json'
 def load_transactions():
     try:
         with open(DATA_FILE, 'r', encoding='utf-8') as file:
-            return json.load(file)
+            transactions = json.load(file)
+            return [Transaction(**transaction) for transaction in transactions]
     except FileNotFoundError:
         return []
     except json.JSONDecodeError as error:
@@ -18,6 +19,7 @@ def load_transactions():
 
 def save_transactions(transactions):
     with open(DATA_FILE, "w", encoding="utf-8") as file:
+        transactions = [transaction.__dict__ for transaction in transactions]
         json.dump(
             transactions,
             file,
@@ -48,8 +50,8 @@ def add_transaction(transactions, amount, category, note=None):
         note=note
     )
     #print(transaction)
-    transactions.append(asdict(transaction))
-    #print(transactions)
+    transactions.append(transaction)
+    print(transactions)
     return transaction
 
 ### FIND TRANSACTIONS
@@ -58,7 +60,7 @@ def find_transactions(transactions: list, category:str) -> list:
     if not category:
         raise ValueError("Category cannot be empty")
 
-    matches = [transaction for transaction in transactions if transaction["category"].strip().lower() == category]
+    matches = [transaction for transaction in transactions if transaction.category.strip().lower() == category]
     if not matches:
         raise ValueError(
             f"No transactions with category '{category}' exist"
