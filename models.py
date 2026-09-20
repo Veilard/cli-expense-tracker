@@ -8,6 +8,10 @@ class Transaction:
     category: str
     note:str | None = None
 
+    @property
+    def formatted_amount(self):
+        return f"{self.amount:_}₸".replace("_", " ")
+
 class ExpenseTracker:
     def __init__(self):
         self.transactions = []

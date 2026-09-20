@@ -2,6 +2,8 @@ import argparse
 import questionary
 
 from questionary import Choice
+from datetime import date
+from models import Transaction
 from tracker import (
     add_transaction,
     find_transactions,
@@ -31,6 +33,7 @@ list_parser.add_argument("--to_date", type=str)
 
 summary_parser = subparser.add_parser("summary")
 
+mock_transaction = Transaction("test", date.today(), 5000, "books")
 if __name__ == '__main__':
     try:
         args = parser.parse_args()

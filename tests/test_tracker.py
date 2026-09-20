@@ -37,7 +37,8 @@ def transactions():
 @pytest.fixture
 def example_tracker(transactions):
     fixture_tracker = ExpenseTracker()
-    fixture_tracker.transactions = transactions.copy()
+    for transaction in transactions:
+        fixture_tracker.add(transaction)
     return fixture_tracker
 # =====================================================TESTS===========================================================
 
