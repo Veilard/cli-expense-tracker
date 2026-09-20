@@ -14,12 +14,24 @@ from unittest.mock import patch
 @pytest.fixture
 def transactions():
     return [
-        Transaction(250000, 'phone'),
-        Transaction(10000, 'recreation'),
-        Transaction(5000, 'food')
-        # {"category": "food","date": "2026-09-10T12:00:00"},
-        # {"category": "taxi","date": "2026-09-11T12:00:00"},
-        # {"category": "food","date": "2026-09-12T12:00:00"}
+        Transaction(
+            id="1",
+            date="2026-09-10T12:00:00",
+            amount=5000,
+            category="food",
+        ),
+        Transaction(
+            id="2",
+            date="2026-09-11T12:00:00",
+            amount=3000,
+            category="taxi",
+        ),
+        Transaction(
+            id="3",
+            date="2026-09-12T12:00:00",
+            amount=4000,
+            category="food",
+        ),
     ]
 
 @pytest.fixture
@@ -39,10 +51,10 @@ def transactions_with_ids():
 
 # =====================================================TESTS===========================================================
 
-def test_calculate_total():
+def test_calculate_total(transactions):
     result = calculate_total(transactions)
 
-    assert result == 4000
+    assert result == 12000
 
 
 def test_add_transaction():
@@ -50,7 +62,7 @@ def test_add_transaction():
 
     transaction = add_transaction(
         transactions,
-        5000,
+        5000,''
         "Food",
         "Lunch"
     )
@@ -77,15 +89,15 @@ def test_add_transaction_calls_uuid_and_is_called_once():
     mock_uuid.assert_called_once()
 
 
-def test_delete_transaction(transactions_with_ids):
-    removed_transaction = delete_transaction(transactions_with_ids, "abc")
+def test_delete_transaction(transactions):
+    removed_transaction = delete_transaction(transactions, "1")
 
-    assert removed_transaction["id"] == "abc"
-    assert transactions_with_ids[0]["id"] == "def"
-    assert len(transactions_with_ids) == 1
+    assert removed_transaction.id == "1"
+    assert transactions[0].id == "2"
+    assert len(transactions) == 2
 
 
-def test_save_transactions(tmp_path, monkeypatch):
+def test_save_transactions(tmp_path, monkeypatch, transactions):
     test_file = tmp_path / "transactions.json"
 
     monkeypatch.setattr(
@@ -94,15 +106,15 @@ def test_save_transactions(tmp_path, monkeypatch):
         test_file
     )
 
-    transactions = [
-        {
-            "id": "abc",
-            "date": "2026-09-17T12:00:00",
-            "amount": 5000,
-            "category": "food",
-            "note": "lunch",
-        }
-    ]
+    # transactions = [
+    #     {
+    #         "id": "abc",
+    #         "date": "2026-09-17T12:00:00",
+    #         "amount": 5000,
+    #         "category": "food",
+    #         "note": "lunch",
+    #     }
+    # ]
 
     tracker.save_transactions(transactions)
 
@@ -126,11 +138,11 @@ def test_load_empty_transactions(tmp_path, monkeypatch):
 
 
 
-def test_delete_transaction_rejects_unknown_trans_id(transactions_with_ids):
+def test_delete_transaction_rejects_unknown_trans_id(transactions):
     trans_id = "unknown"
 
     with pytest.raises(ValueError, match=f"Transaction with id {trans_id} does not exist"):
-        tracker.delete_transaction(transactions_with_ids, trans_id)
+        tracker.delete_transaction(transactions, trans_id)
 
 
 @pytest.mark.parametrize("amount", [-5000, 0])
@@ -164,7 +176,7 @@ def test_filter_transactions_by_category(transactions):
     )
 
     assert len(result) == 2
-    assert all(transaction["category"] == "food" for transaction in result)
+    assert all(transaction.category == "food" for transaction in result)
 
 
 def test_filter_transactions_from_date(transactions):
@@ -174,5 +186,5 @@ def test_filter_transactions_from_date(transactions):
     )
 
     assert len(result) == 2
-    assert result[0]["date"] == "2026-09-11T12:00:00"
-    assert result[1]["date"] == "2026-09-12T12:00:00"
+    assert result[0].date == "2026-09-11T12:00:00"
+    assert result[1].date == "2026-09-12T12:00:00"
