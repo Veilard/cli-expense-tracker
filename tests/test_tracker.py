@@ -1,6 +1,6 @@
 import pytest
 import tracker
-from models import Transaction
+from models import Transaction, ExpenseTracker
 
 from tracker import (
     add_transaction,
@@ -33,13 +33,21 @@ def transactions():
             category="food",
         ),
     ]
+
+@pytest.fixture
+def example_tracker(transactions):
+    fixture_tracker = ExpenseTracker()
+    fixture_tracker.transactions = transactions.copy()
+    return fixture_tracker
 # =====================================================TESTS===========================================================
 
 def test_calculate_total(transactions):
     result = calculate_total(transactions)
-
     assert result == 12000
 
+def test_collection_calc_total_method(example_tracker):
+    result = example_tracker.calc_total()
+    assert result == 12000
 
 def test_add_transaction():
     transactions = []
