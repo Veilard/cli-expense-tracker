@@ -83,7 +83,6 @@ if __name__ == '__main__':
                 print(
                     f"{transaction.date} || "
                     f"{transaction.category} || "
-                    f"{transaction.category} || "
                     f"{transaction.amount:_} ||".replace("_", " ") +
                     f"{transaction.note if transaction.note else ""}"
                 )

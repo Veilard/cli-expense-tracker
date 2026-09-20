@@ -50,9 +50,7 @@ def add_transaction(transactions, amount, category, note=None):
         category=category,
         note=note
     )
-    #print(transaction)
     transactions.append(transaction)
-    #print(transactions)
     return transaction
 
 ### FIND TRANSACTIONS
@@ -108,8 +106,7 @@ def filter_transactions(
     return transactions
 
 ### DELETE
-def delete_transaction(transactions, trans_id) -> dict:
-
+def delete_transaction(transactions, trans_id):
     for transaction in transactions:
         if transaction.id == trans_id:
             transactions.remove(transaction)
@@ -137,5 +134,4 @@ def summarize_by_category(transactions):
     )
 
 def calculate_total(transactions):
-    print(transactions)
     return sum(transaction.amount for transaction in transactions)

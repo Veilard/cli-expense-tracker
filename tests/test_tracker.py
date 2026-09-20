@@ -33,22 +33,6 @@ def transactions():
             category="food",
         ),
     ]
-
-@pytest.fixture
-def transactions_with_ids():
-    return [
-        {
-            "id": "abc",
-            "category": "food",
-            "amount": 5000,
-        },
-        {
-            "id": "def",
-            "category": "taxi",
-            "amount": 3000,
-        },
-    ]
-
 # =====================================================TESTS===========================================================
 
 def test_calculate_total(transactions):
@@ -62,7 +46,7 @@ def test_add_transaction():
 
     transaction = add_transaction(
         transactions,
-        5000,''
+        5000,
         "Food",
         "Lunch"
     )
@@ -82,9 +66,6 @@ def test_add_transaction_calls_uuid_and_is_called_once():
             5000,
             "food"
         )
-
-    print(mock_uuid.call_args)
-
     assert transaction.id == "fixed_id"
     mock_uuid.assert_called_once()
 
@@ -105,17 +86,6 @@ def test_save_transactions(tmp_path, monkeypatch, transactions):
         "DATA_FILE",
         test_file
     )
-
-    # transactions = [
-    #     {
-    #         "id": "abc",
-    #         "date": "2026-09-17T12:00:00",
-    #         "amount": 5000,
-    #         "category": "food",
-    #         "note": "lunch",
-    #     }
-    # ]
-
     tracker.save_transactions(transactions)
 
     loaded = tracker.load_transactions()
@@ -134,8 +104,6 @@ def test_load_empty_transactions(tmp_path, monkeypatch):
 
     loaded = tracker.load_transactions()
     assert loaded == []
-
-
 
 
 def test_delete_transaction_rejects_unknown_trans_id(transactions):
