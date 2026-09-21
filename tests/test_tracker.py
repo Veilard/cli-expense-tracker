@@ -65,7 +65,10 @@ def test_add_transaction():
     assert transaction.note == "Lunch"
     assert len(transactions) == 1
 
+def test_formatted_amount(transactions):
+    result = transactions[0].formatted_amount
 
+    assert result == '5 000 ₸'
 def test_add_transaction_calls_uuid_and_is_called_once():
     transactions = []
 
@@ -131,6 +134,16 @@ def test_add_transaction_rejects_invalid_amount(amount):
             transactions,
             amount,
             "food"
+        )
+
+
+def test_transaction_instantiation_rejects_invalid_amount():
+    with pytest.raises(ValueError, match="Invalid amount"):
+        Transaction(
+            id="1",
+            date="2026-09-21",
+            amount=-5000,
+            category="food",
         )
 
 

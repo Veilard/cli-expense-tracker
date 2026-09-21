@@ -30,19 +30,6 @@ def save_transactions(transactions):
 
 ### ADD
 def add_transaction(transactions, amount, category, note=None):
-    # Category validation
-    if not isinstance(category, str):
-        raise ValueError("Category must be a string")
-
-    category = category.strip().lower()
-
-    if not category:
-        raise ValueError("Invalid category")
-
-    # Amount validation
-    if type(amount) is not int or amount <= 0:
-        raise ValueError("Invalid amount")
-
     transaction = Transaction(
         id=str(uuid.uuid4()),
         date=datetime.now().isoformat(timespec="seconds"),

@@ -8,9 +8,24 @@ class Transaction:
     category: str
     note:str | None = None
 
+
+    def __post_init__(self):
+        if type(self.amount) is not int or self.amount <= 0:
+            raise ValueError("Invalid amount")
+
+        if not isinstance(self.category, str):
+            raise ValueError("Category must be a string")
+
+        self.category = self.category.strip().lower()
+
+        if not self.category:
+            raise ValueError("Invalid category")
+
+
     @property
     def formatted_amount(self):
-        return f"{self.amount:_}₸".replace("_", " ")
+        return f"{self.amount:_} ₸".replace("_", " ")
+
 
 class ExpenseTracker:
     def __init__(self):
