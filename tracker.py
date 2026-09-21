@@ -4,6 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from models import Transaction
 from dataclasses import asdict
+from exceptions import TransactionNotFoundError
 
 DATA_FILE = Path(__file__).resolve().parent / 'transactions.json'
 
@@ -48,7 +49,7 @@ def find_transactions(transactions: list, category:str) -> list:
 
     matches = [transaction for transaction in transactions if transaction.category.strip().lower() == category]
     if not matches:
-        raise ValueError(
+        raise TransactionNotFoundError(
             f"No transactions with category '{category}' exist"
         )
 

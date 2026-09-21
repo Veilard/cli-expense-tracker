@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from exceptions import InvalidAmountError, InvalidCategoryError
 
 @dataclass
 class Transaction:
@@ -11,15 +12,15 @@ class Transaction:
 
     def __post_init__(self):
         if type(self.amount) is not int or self.amount <= 0:
-            raise ValueError("Invalid amount")
+            raise InvalidAmountError("Invalid amount")
 
         if not isinstance(self.category, str):
-            raise ValueError("Category must be a string")
+            raise InvalidCategoryError("Category must be a string")
 
         self.category = self.category.strip().lower()
 
         if not self.category:
-            raise ValueError("Invalid category")
+            raise InvalidCategoryError("Invalid category")
 
 
     @property

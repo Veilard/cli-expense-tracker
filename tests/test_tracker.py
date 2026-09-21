@@ -1,6 +1,7 @@
 import pytest
 import tracker
 from models import Transaction, ExpenseTracker
+from exceptions import *
 
 from tracker import (
     add_transaction,
@@ -129,7 +130,7 @@ def test_delete_transaction_rejects_unknown_trans_id(transactions):
 def test_add_transaction_rejects_invalid_amount(amount):
     transactions = []
 
-    with pytest.raises(ValueError, match="Invalid amount"):
+    with pytest.raises(InvalidAmountError):
         tracker.add_transaction(
             transactions,
             amount,
@@ -138,7 +139,7 @@ def test_add_transaction_rejects_invalid_amount(amount):
 
 
 def test_transaction_instantiation_rejects_invalid_amount():
-    with pytest.raises(ValueError, match="Invalid amount"):
+    with pytest.raises(InvalidAmountError):
         Transaction(
             id="1",
             date="2026-09-21",
@@ -151,7 +152,7 @@ def test_transaction_instantiation_rejects_invalid_amount():
 def test_add_transaction_rejects_invalid_category(category):
     transactions = []
 
-    with pytest.raises(ValueError, match="Invalid category"):
+    with pytest.raises(InvalidCategoryError):
         add_transaction(
             transactions,
             5000,
