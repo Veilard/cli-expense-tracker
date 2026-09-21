@@ -1,7 +1,11 @@
 import pytest
 import tracker
 from models import Transaction, ExpenseTracker
-from exceptions import *
+from exceptions import (
+    TransactionNotFoundError,
+    InvalidCategoryError,
+    InvalidAmountError
+)
 
 from tracker import (
     add_transaction,
@@ -122,7 +126,7 @@ def test_load_empty_transactions(tmp_path, monkeypatch):
 def test_delete_transaction_rejects_unknown_trans_id(transactions):
     trans_id = "unknown"
 
-    with pytest.raises(ValueError, match=f"Transaction with id {trans_id} does not exist"):
+    with pytest.raises(TransactionNotFoundError):
         tracker.delete_transaction(transactions, trans_id)
 
 

@@ -100,7 +100,7 @@ def delete_transaction(transactions, trans_id):
             transactions.remove(transaction)
             return transaction
 
-    raise ValueError(f"Transaction with id {trans_id} does not exist")
+    raise TransactionNotFoundError(f"Transaction with id {trans_id} does not exist")
 
 ### SUMMARIZE
 def summarize_by_category(transactions):
