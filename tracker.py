@@ -5,8 +5,20 @@ from pathlib import Path
 from models import Transaction
 from dataclasses import asdict
 from exceptions import TransactionNotFoundError
+from functools import wraps
 
 DATA_FILE = Path(__file__).resolve().parent / 'transactions.json'
+
+
+def log_call(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        print(f"START {func.__name__}")
+        result = func(*args, **kwargs)
+        print(f"END {func.__name__}")
+        return result
+    return wrapper
+
 
 def load_transactions():
     try:
@@ -121,5 +133,7 @@ def summarize_by_category(transactions):
         )
     )
 
+
+@log_call
 def calculate_total(transactions):
     return sum(transaction.amount for transaction in transactions)
