@@ -10,7 +10,7 @@ class Transaction:
     note:str | None = None
 
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if type(self.amount) is not int or self.amount <= 0:
             raise InvalidAmountError("Invalid amount")
 
@@ -24,16 +24,16 @@ class Transaction:
 
 
     @property
-    def formatted_amount(self):
+    def formatted_amount(self) -> str:
         return f"{self.amount:_} ₸".replace("_", " ")
 
 
 class ExpenseTracker:
-    def __init__(self):
-        self.transactions = []
+    def __init__(self) -> None:
+        self.transactions: list[Transaction] = []
 
-    def add(self, transaction):
+    def add(self, transaction: Transaction) -> None:
         self.transactions.append(transaction)
 
-    def calc_total(self):
+    def calc_total(self) -> int:
         return sum(x.amount for x in self.transactions)

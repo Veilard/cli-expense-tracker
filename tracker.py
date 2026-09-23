@@ -81,9 +81,9 @@ def find_transactions(transactions: list[Transaction], category: str) -> list[Tr
 
 def filter_transactions(
         transactions: list[Transaction],
-        category: str = None,
-        from_date: datetime = None,
-        to_date: datetime = None,
+        category: str | None = None,
+        from_date: str | None = None,
+        to_date: str | None = None,
 ) -> list[Transaction]:
     if category:
         category = category.strip().lower()
@@ -116,7 +116,7 @@ def filter_transactions(
 
 
 ### DELETE
-def delete_transaction(transactions: list[Transaction], trans_id) -> Transaction:
+def delete_transaction(transactions: list[Transaction], trans_id: str) -> Transaction:
     for transaction in transactions:
         if transaction.id == trans_id:
             transactions.remove(transaction)
