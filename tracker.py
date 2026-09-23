@@ -17,10 +17,11 @@ def log_call(func):
         result = func(*args, **kwargs)
         print(f"END {func.__name__}")
         return result
+
     return wrapper
 
 
-def load_transactions():
+def load_transactions() -> list[Transaction]:
     try:
         with open(DATA_FILE, 'r', encoding='utf-8') as file:
             transactions = json.load(file)
@@ -30,7 +31,8 @@ def load_transactions():
     except json.JSONDecodeError as error:
         raise ValueError("Invalid json file") from error
 
-def save_transactions(transactions):
+
+def save_transactions(transactions: list[Transaction]) -> None:
     data = [asdict(transaction) for transaction in transactions]
 
     with open(DATA_FILE, "w", encoding="utf-8") as file:
@@ -41,8 +43,14 @@ def save_transactions(transactions):
             indent=2
         )
 
+
 ### ADD
-def add_transaction(transactions, amount, category, note=None):
+def add_transaction(
+        transactions: list[Transaction],
+        amount: int,
+        category: str,
+        note: str | None = None
+) -> Transaction:
     transaction = Transaction(
         id=str(uuid.uuid4()),
         date=datetime.now().isoformat(timespec="seconds"),
@@ -53,8 +61,9 @@ def add_transaction(transactions, amount, category, note=None):
     transactions.append(transaction)
     return transaction
 
+
 ### FIND TRANSACTIONS
-def find_transactions(transactions: list, category:str) -> list:
+def find_transactions(transactions: list[Transaction], category: str) -> list[Transaction]:
     category = category.strip().lower()
     if not category:
         raise ValueError("Category cannot be empty")
@@ -67,15 +76,15 @@ def find_transactions(transactions: list, category:str) -> list:
 
     return matches
 
+
 ### FILTER TRANSACTIONS
 
 def filter_transactions(
-    transactions: list,
-    category: str = None,
-    from_date=None,
-    to_date=None,
-) -> list:
-
+        transactions: list[Transaction],
+        category: str = None,
+        from_date: datetime = None,
+        to_date: datetime = None,
+) -> list[Transaction]:
     if category:
         category = category.strip().lower()
 
@@ -105,8 +114,9 @@ def filter_transactions(
 
     return transactions
 
+
 ### DELETE
-def delete_transaction(transactions, trans_id):
+def delete_transaction(transactions: list[Transaction], trans_id) -> Transaction:
     for transaction in transactions:
         if transaction.id == trans_id:
             transactions.remove(transaction)
@@ -114,15 +124,16 @@ def delete_transaction(transactions, trans_id):
 
     raise TransactionNotFoundError(f"Transaction with id {trans_id} does not exist")
 
+
 ### SUMMARIZE
-def summarize_by_category(transactions):
+def summarize_by_category(transactions: list[Transaction]) -> dict[str, int]:
     totals_by_category = {}
 
     for transaction in transactions:
         category = transaction.category.strip().lower()
         totals_by_category[category] = (
-            totals_by_category.get(category, 0)
-            + transaction.amount
+                totals_by_category.get(category, 0)
+                + transaction.amount
         )
 
     return dict(
@@ -135,5 +146,5 @@ def summarize_by_category(transactions):
 
 
 @log_call
-def calculate_total(transactions):
+def calculate_total(transactions: list[Transaction]) -> int:
     return sum(transaction.amount for transaction in transactions)
