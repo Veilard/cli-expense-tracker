@@ -2,6 +2,7 @@ import sqlite3
 from pathlib import Path
 from models import Transaction
 from exceptions import TransactionNotFoundError
+from tracker import log_call
 
 DB_FILE = Path(__file__).resolve().parent / "expenses.db"
 
@@ -54,7 +55,7 @@ def load_transactions() -> list[Transaction]:
 
         return [Transaction(*row) for row in rows]
 
-
+@log_call
 def delete_transaction(transaction_id) -> None:
     with sqlite3.connect(DB_FILE) as connection:
         cursor = connection.execute(

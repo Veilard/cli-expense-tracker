@@ -21,31 +21,30 @@ def log_call(func):
     return wrapper
 
 
-def load_transactions() -> list[Transaction]:
-    try:
-        with open(DATA_FILE, 'r', encoding='utf-8') as file:
-            transactions = json.load(file)
-            return [Transaction(**transaction) for transaction in transactions]
-    except FileNotFoundError:
-        return []
-    except json.JSONDecodeError as error:
-        raise ValueError("Invalid json file") from error
+# def load_transactions() -> list[Transaction]:
+#     try:
+#         with open(DATA_FILE, 'r', encoding='utf-8') as file:
+#             transactions = json.load(file)
+#             return [Transaction(**transaction) for transaction in transactions]
+#     except FileNotFoundError:
+#         return []
+#     except json.JSONDecodeError as error:
+#         raise ValueError("Invalid json file") from error
 
 
-def save_transactions(transactions: list[Transaction]) -> None:
-    data = [asdict(transaction) for transaction in transactions]
+# def save_transactions(transactions: list[Transaction]) -> None:
+#     data = [asdict(transaction) for transaction in transactions]
+#
+#     with open(DATA_FILE, "w", encoding="utf-8") as file:
+#         json.dump(
+#             data,
+#             file,
+#             ensure_ascii=False,
+#             indent=2
+#         )
 
-    with open(DATA_FILE, "w", encoding="utf-8") as file:
-        json.dump(
-            data,
-            file,
-            ensure_ascii=False,
-            indent=2
-        )
 
-
-### ADD
-def add_transaction(
+def form_transaction_from_args(
         transactions: list[Transaction],
         amount: int,
         category: str,
@@ -58,7 +57,6 @@ def add_transaction(
         category=category,
         note=note
     )
-    transactions.append(transaction)
     return transaction
 
 

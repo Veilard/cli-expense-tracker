@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from exceptions import InvalidAmountError, InvalidCategoryError
 
+
 @dataclass
 class Transaction:
     id: str

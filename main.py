@@ -5,14 +5,20 @@ from questionary import Choice
 from datetime import date
 from models import Transaction
 from tracker import (
-    add_transaction,
+    form_transaction_from_args,
     find_transactions,
     filter_transactions,
-    delete_transaction,
+   # delete_transaction,
     calculate_total,
-    load_transactions,
-    save_transactions,
+    #load_transactions,
+    #save_transactions,
     summarize_by_category,
+)
+from database import (
+    init_db,
+    insert_transaction,
+    load_transactions,
+    delete_transaction as delete_transaction_db
 )
 
 parser = argparse.ArgumentParser(description="Track expense tracker")
@@ -36,13 +42,14 @@ summary_parser = subparser.add_parser("summary")
 mock_transaction = Transaction("test", date.today(), 5000, "books")
 if __name__ == '__main__':
     try:
+        init_db()
         args = parser.parse_args()
 
         transactions = load_transactions()
 
         if args.command == "add":
-            transaction = add_transaction(transactions, args.amount, args.category, args.note)
-            save_transactions(transactions)
+            transaction = form_transaction_from_args(transactions, args.amount, args.category, args.note)
+            insert_transaction(transaction)
             print(
                 "Transaction added: "
                 f"{transaction.category} — {transaction.amount:_} ₸"
@@ -68,14 +75,14 @@ if __name__ == '__main__':
                 ]
             ).ask()
 
-            removed_transaction = delete_transaction(transactions, removed_trans_id)
-            save_transactions(transactions)
+            delete_transaction_db(removed_trans_id)
+            #save_transactions(transactions)
 
-            print(f"Removed {removed_transaction.id} "
-                  f"|| {removed_transaction.date} "
-                  f"|| {removed_transaction.category} "
-                  f"|| {removed_transaction.amount}"
-                  )
+            # print(f"Removed {removed_transaction.id} "
+            #       f"|| {removed_transaction.date} "
+            #       f"|| {removed_transaction.category} "
+            #       f"|| {removed_transaction.amount}"
+            #       )
 
         elif args.command == "list":
             transactions = filter_transactions(transactions, args.category, args.from_date, args.to_date)
