@@ -1,4 +1,6 @@
 import pytest
+from _pytest import monkeypatch
+
 import tracker
 import database
 from models import Transaction, ExpenseTracker
@@ -57,6 +59,23 @@ def example_tracker(transactions):
     return fixture_tracker
 
 
+def test_db_substitute(func):
+    def wrapper(tmp_path, monkeypatch, *args, **kwargs):
+        test_db = tmp_path / "expenses.db"
+
+        monkeypatch.setattr(
+            database,
+            "DB_FILE",
+            test_db
+        )
+
+        init_db()
+
+        result = func(*args, **kwargs)
+        return result
+    return wrapper
+
+
 # =====================================================TESTS===========================================================
 
 def test_calculate_total(transactions):
@@ -76,18 +95,16 @@ def test_create_transaction(transactions):
     assert transaction.category == "food"
     assert transaction.note == "Lunch"
 
+@test_db_substitute
+def test_insert_transaction():
+    transaction = Transaction(
+            id="1",
+            date="2026-09-10T12:00:00",
+            amount=5000,
+            category="food",
+            note="Lunch"
+        )
 
-def test_insert_transaction(tmp_path, monkeypatch, transactions):
-    test_db = tmp_path / "expenses.db"
-
-    monkeypatch.setattr(
-        database,
-        "DB_FILE",
-        test_db
-    )
-    transaction = transactions[0]
-
-    init_db()
     insert_transaction(transaction)
     loaded = database.load_transactions()
 
