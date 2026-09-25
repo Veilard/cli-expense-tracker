@@ -42,7 +42,7 @@ if __name__ == '__main__':
         transactions = load_transactions()
 
         if args.command == "add":
-            transaction = create_transaction(transactions, args.amount, args.category, args.note)
+            transaction = create_transaction(args.amount, args.category, args.note)
             insert_transaction(transaction)
             print(
                 "Transaction added: "

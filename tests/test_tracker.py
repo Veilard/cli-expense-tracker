@@ -10,14 +10,14 @@ from exceptions import (
 
 from tracker import (
     create_transaction,
-    delete_transaction,
     filter_transactions,
     calculate_total
 )
 
 from database import (
     init_db,
-    insert_transaction
+    insert_transaction,
+    delete_transaction
 )
 from unittest.mock import patch
 
@@ -89,6 +89,9 @@ def test_insert_transaction(tmp_path, monkeypatch, transactions):
 
     init_db()
     insert_transaction(transaction)
+    loaded = database.load_transactions()
+
+    assert loaded == [transaction]
 
 
 def test_formatted_amount(transactions):
@@ -105,14 +108,6 @@ def test_create_transaction_calls_uuid_and_is_called_once():
         )
     assert transaction.id == "fixed_id"
     mock_uuid.assert_called_once()
-
-
-def test_delete_transaction(transactions):
-    removed_transaction = delete_transaction(transactions, "1")
-
-    assert removed_transaction.id == "1"
-    assert transactions[0].id == "2"
-    assert len(transactions) == 2
 
 
 def test_load_transactions(tmp_path, monkeypatch, transactions):
@@ -147,11 +142,38 @@ def test_load_empty_transactions(tmp_path, monkeypatch):
     assert loaded == []
 
 
-def test_delete_transaction_rejects_unknown_trans_id(transactions):
+def test_delete_transaction(transactions, tmp_path, monkeypatch):
+    test_db = tmp_path / "expenses.db"
+
+    monkeypatch.setattr(
+        database,
+        "DB_FILE",
+        test_db
+    )
+
+    transaction = transactions[0]
+    init_db()
+    insert_transaction(transaction)
+    loaded = database.load_transactions()
+    deleted = delete_transaction(transaction.id)
+
+    assert loaded == deleted
+
+
+def test_delete_transaction_rejects_unknown_trans_id(tmp_path, monkeypatch):
+    test_db = tmp_path / "expenses.db"
+
+    monkeypatch.setattr(
+        database,
+        "DB_FILE",
+        test_db
+    )
+
     trans_id = "unknown"
 
+    init_db()
     with pytest.raises(TransactionNotFoundError):
-        tracker.delete_transaction(transactions, trans_id)
+        database.delete_transaction(trans_id)
 
 
 @pytest.mark.parametrize("amount", [-5000, 0])

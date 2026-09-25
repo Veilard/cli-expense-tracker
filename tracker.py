@@ -2,18 +2,6 @@ import uuid
 from datetime import datetime
 from models import Transaction
 from exceptions import TransactionNotFoundError
-from functools import wraps
-
-
-def log_call(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        print(f"START {func.__name__}")
-        result = func(*args, **kwargs)
-        print(f"END {func.__name__}")
-        return result
-
-    return wrapper
 
 
 def create_transaction(
@@ -31,7 +19,6 @@ def create_transaction(
     return transaction
 
 
-### FIND TRANSACTIONS
 def find_transactions(
         transactions: list[Transaction],
         category: str
@@ -49,7 +36,6 @@ def find_transactions(
     return matches
 
 
-### FILTER TRANSACTIONS
 def filter_transactions(
         transactions: list[Transaction],
         category: str | None = None,
@@ -86,17 +72,6 @@ def filter_transactions(
     return transactions
 
 
-### DELETE
-def delete_transaction(transactions: list[Transaction], trans_id: str) -> Transaction:
-    for transaction in transactions:
-        if transaction.id == trans_id:
-            transactions.remove(transaction)
-            return transaction
-
-    raise TransactionNotFoundError(f"Transaction with id {trans_id} does not exist")
-
-
-### SUMMARIZE
 def summarize_by_category(transactions: list[Transaction]) -> dict[str, int]:
     totals_by_category = {}
 
@@ -116,6 +91,5 @@ def summarize_by_category(transactions: list[Transaction]) -> dict[str, int]:
     )
 
 
-@log_call
 def calculate_total(transactions: list[Transaction]) -> int:
     return sum(transaction.amount for transaction in transactions)
