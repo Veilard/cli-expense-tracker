@@ -1,13 +1,8 @@
-import json
 import uuid
 from datetime import datetime
-from pathlib import Path
 from models import Transaction
-from dataclasses import asdict
 from exceptions import TransactionNotFoundError
 from functools import wraps
-
-DATA_FILE = Path(__file__).resolve().parent / 'transactions.json'
 
 
 def log_call(func):
@@ -21,31 +16,7 @@ def log_call(func):
     return wrapper
 
 
-# def load_transactions() -> list[Transaction]:
-#     try:
-#         with open(DATA_FILE, 'r', encoding='utf-8') as file:
-#             transactions = json.load(file)
-#             return [Transaction(**transaction) for transaction in transactions]
-#     except FileNotFoundError:
-#         return []
-#     except json.JSONDecodeError as error:
-#         raise ValueError("Invalid json file") from error
-
-
-# def save_transactions(transactions: list[Transaction]) -> None:
-#     data = [asdict(transaction) for transaction in transactions]
-#
-#     with open(DATA_FILE, "w", encoding="utf-8") as file:
-#         json.dump(
-#             data,
-#             file,
-#             ensure_ascii=False,
-#             indent=2
-#         )
-
-
-def form_transaction_from_args(
-        transactions: list[Transaction],
+def create_transaction(
         amount: int,
         category: str,
         note: str | None = None
@@ -61,7 +32,10 @@ def form_transaction_from_args(
 
 
 ### FIND TRANSACTIONS
-def find_transactions(transactions: list[Transaction], category: str) -> list[Transaction]:
+def find_transactions(
+        transactions: list[Transaction],
+        category: str
+) -> list[Transaction]:
     category = category.strip().lower()
     if not category:
         raise ValueError("Category cannot be empty")
@@ -76,7 +50,6 @@ def find_transactions(transactions: list[Transaction], category: str) -> list[Tr
 
 
 ### FILTER TRANSACTIONS
-
 def filter_transactions(
         transactions: list[Transaction],
         category: str | None = None,

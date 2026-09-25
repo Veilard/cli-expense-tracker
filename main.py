@@ -2,16 +2,11 @@ import argparse
 import questionary
 
 from questionary import Choice
-from datetime import date
-from models import Transaction
 from tracker import (
-    form_transaction_from_args,
+    create_transaction,
     find_transactions,
     filter_transactions,
-   # delete_transaction,
     calculate_total,
-    #load_transactions,
-    #save_transactions,
     summarize_by_category,
 )
 from database import (
@@ -39,7 +34,6 @@ list_parser.add_argument("--to_date", type=str)
 
 summary_parser = subparser.add_parser("summary")
 
-mock_transaction = Transaction("test", date.today(), 5000, "books")
 if __name__ == '__main__':
     try:
         init_db()
@@ -48,7 +42,7 @@ if __name__ == '__main__':
         transactions = load_transactions()
 
         if args.command == "add":
-            transaction = form_transaction_from_args(transactions, args.amount, args.category, args.note)
+            transaction = create_transaction(transactions, args.amount, args.category, args.note)
             insert_transaction(transaction)
             print(
                 "Transaction added: "
@@ -57,7 +51,6 @@ if __name__ == '__main__':
             )
 
         elif args.command == "delete":
-
             matches = find_transactions(transactions, args.category)
             removed_trans_id = questionary.select(
                 "Select a transaction to remove",
@@ -76,13 +69,6 @@ if __name__ == '__main__':
             ).ask()
 
             delete_transaction_db(removed_trans_id)
-            #save_transactions(transactions)
-
-            # print(f"Removed {removed_transaction.id} "
-            #       f"|| {removed_transaction.date} "
-            #       f"|| {removed_transaction.category} "
-            #       f"|| {removed_transaction.amount}"
-            #       )
 
         elif args.command == "list":
             transactions = filter_transactions(transactions, args.category, args.from_date, args.to_date)

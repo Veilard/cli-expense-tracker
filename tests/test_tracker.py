@@ -1,5 +1,6 @@
 import pytest
 import tracker
+import database
 from models import Transaction, ExpenseTracker
 from exceptions import (
     TransactionNotFoundError,
@@ -8,12 +9,19 @@ from exceptions import (
 )
 
 from tracker import (
-    add_transaction,
+    create_transaction,
     delete_transaction,
     filter_transactions,
     calculate_total
 )
+
+from database import (
+    init_db,
+    insert_transaction
+)
 from unittest.mock import patch
+
+
 # =====================================================FIXTURES=====================================================
 
 @pytest.fixture
@@ -24,6 +32,7 @@ def transactions():
             date="2026-09-10T12:00:00",
             amount=5000,
             category="food",
+            note="Lunch"
         ),
         Transaction(
             id="2",
@@ -39,47 +48,58 @@ def transactions():
         ),
     ]
 
+
 @pytest.fixture
 def example_tracker(transactions):
     fixture_tracker = ExpenseTracker()
     for transaction in transactions:
         fixture_tracker.add(transaction)
     return fixture_tracker
+
+
 # =====================================================TESTS===========================================================
 
 def test_calculate_total(transactions):
     result = calculate_total(transactions)
     assert result == 12000
 
+
 def test_collection_calc_total_method(example_tracker):
     result = example_tracker.calc_total()
     assert result == 12000
 
-def test_add_transaction():
-    transactions = []
 
-    transaction = add_transaction(
-        transactions,
-        5000,
-        "Food",
-        "Lunch"
-    )
+def test_create_transaction(transactions):
+    transaction = create_transaction(5000, "food", "Lunch")
 
     assert transaction.amount == 5000
     assert transaction.category == "food"
     assert transaction.note == "Lunch"
-    assert len(transactions) == 1
+
+
+def test_insert_transaction(tmp_path, monkeypatch, transactions):
+    test_db = tmp_path / "expenses.db"
+
+    monkeypatch.setattr(
+        database,
+        "DB_FILE",
+        test_db
+    )
+    transaction = transactions[0]
+
+    init_db()
+    insert_transaction(transaction)
+
 
 def test_formatted_amount(transactions):
     result = transactions[0].formatted_amount
 
     assert result == '5 000 ₸'
-def test_add_transaction_calls_uuid_and_is_called_once():
-    transactions = []
 
+
+def test_create_transaction_calls_uuid_and_is_called_once():
     with patch("tracker.uuid.uuid4", return_value="fixed_id") as mock_uuid:
-        transaction = tracker.add_transaction(
-            transactions,
+        transaction = tracker.create_transaction(
             5000,
             "food"
         )
@@ -95,31 +115,35 @@ def test_delete_transaction(transactions):
     assert len(transactions) == 2
 
 
-def test_save_transactions(tmp_path, monkeypatch, transactions):
-    test_file = tmp_path / "transactions.json"
+def test_load_transactions(tmp_path, monkeypatch, transactions):
+    test_db = tmp_path / "expenses.db"
 
     monkeypatch.setattr(
-        tracker,
-        "DATA_FILE",
-        test_file
+        database,
+        "DB_FILE",
+        test_db
     )
-    tracker.save_transactions(transactions)
 
-    loaded = tracker.load_transactions()
+    init_db()
+    for transaction in transactions:
+        insert_transaction(transaction)
+    loaded = database.load_transactions()
 
-    assert test_file.exists()
+    assert test_db.exists()
     assert loaded == transactions
 
+
 def test_load_empty_transactions(tmp_path, monkeypatch):
-    test_file = tmp_path / "transactions.json"
+    test_db = tmp_path / "expenses.db"
 
     monkeypatch.setattr(
-        tracker,
-        "DATA_FILE",
-        test_file
+        database,
+        "DB_FILE",
+        test_db
     )
 
-    loaded = tracker.load_transactions()
+    init_db()
+    loaded = database.load_transactions()
     assert loaded == []
 
 
@@ -131,12 +155,9 @@ def test_delete_transaction_rejects_unknown_trans_id(transactions):
 
 
 @pytest.mark.parametrize("amount", [-5000, 0])
-def test_add_transaction_rejects_invalid_amount(amount):
-    transactions = []
-
+def test_create_transaction_rejects_invalid_amount(amount):
     with pytest.raises(InvalidAmountError):
-        tracker.add_transaction(
-            transactions,
+        tracker.create_transaction(
             amount,
             "food"
         )
@@ -153,12 +174,9 @@ def test_transaction_instantiation_rejects_invalid_amount():
 
 
 @pytest.mark.parametrize("category", ["   ", ""])
-def test_add_transaction_rejects_invalid_category(category):
-    transactions = []
-
+def test_create_transaction_rejects_invalid_category(category):
     with pytest.raises(InvalidCategoryError):
-        add_transaction(
-            transactions,
+        tracker.create_transaction(
             5000,
             category
         )
