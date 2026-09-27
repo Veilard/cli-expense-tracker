@@ -57,6 +57,58 @@ def insert_transaction(transaction: Transaction) -> None:
         )
 
 
+def update_transaction(
+        transaction_id: str,
+        amount: int | None = None,
+        category: str | None = None,
+        note: str | None = None
+) -> Transaction:
+    with sqlite3.connect(DB_FILE) as connection:
+        row = connection.execute(
+            """
+            SELECT id, date, amount, category, note
+            FROM transactions
+            WHERE id = ?
+            """,
+            (transaction_id,)
+        ).fetchone()
+
+        if row is None:
+            raise TransactionNotFoundError(f"Transaction with id {transaction_id} does not exist")
+
+        old_transaction = Transaction(*row)
+
+        new_amount = amount if amount is not None else old_transaction.amount
+        new_category = category if category is not None else old_transaction.category
+        new_note = note if note is not None else old_transaction.note
+
+        updated_transaction = Transaction(
+            old_transaction.id,
+            old_transaction.date,
+            new_amount,
+            new_category,
+            new_note
+        )
+
+        connection.execute(
+            """
+            UPDATE transactions
+            SET amount   = ?,
+                category = ?,
+                note     = ?
+            WHERE id = ?
+            """,
+            (
+                updated_transaction.amount,
+                updated_transaction.category,
+                updated_transaction.note,
+                transaction_id
+            )
+        )
+
+        return updated_transaction
+
+
 def load_transactions() -> list[Transaction]:
     with sqlite3.connect(DB_FILE) as connection:
         rows = connection.execute(
@@ -72,16 +124,16 @@ def load_transactions() -> list[Transaction]:
 @log_call
 def delete_transaction(transaction_id: str) -> list[Transaction]:
     with sqlite3.connect(DB_FILE) as connection:
-        rows = connection.execute(
+        row = connection.execute(
             """
             SELECT *
             FROM transactions
             WHERE id = ?
             """,
-            (transaction_id,),
-        ).fetchall()
+            (transaction_id,)
+        ).fetchone()
 
-        if not rows:
+        if not row:
             raise TransactionNotFoundError(f"Transaction with id {transaction_id} does not exist")
 
         connection.execute(
@@ -93,4 +145,4 @@ def delete_transaction(transaction_id: str) -> list[Transaction]:
             (transaction_id,)
         )
 
-        return [Transaction(*row) for row in rows]
+        return [Transaction(*row)]
