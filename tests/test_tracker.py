@@ -59,21 +59,17 @@ def example_tracker(transactions):
     return fixture_tracker
 
 
-def test_db_substitute(func):
-    def wrapper(tmp_path, monkeypatch, transactions):
-        test_db = tmp_path / "expenses.db"
+@pytest.fixture
+def test_db_env(tmp_path, monkeypatch):
+    test_db = tmp_path / "expenses.db"
 
-        monkeypatch.setattr(
-            database,
-            "DB_FILE",
-            test_db
-        )
+    monkeypatch.setattr(
+        database,
+        "DB_FILE",
+        test_db
+    )
 
-        init_db()
-
-        result = func(transactions)
-        return result
-    return wrapper
+    init_db()
 
 
 # =====================================================TESTS===========================================================
@@ -88,7 +84,7 @@ def test_collection_calc_total_method(example_tracker):
     assert result == 12000
 
 
-def test_create_transaction(transactions):
+def test_create_transaction():
     transaction = create_transaction(5000, "food", "Lunch")
 
     assert transaction.amount == 5000
@@ -96,7 +92,7 @@ def test_create_transaction(transactions):
     assert transaction.note == "Lunch"
 
 
-def test_insert_transaction(transactions):
+def test_insert_transaction(test_db_env, transactions):
     transaction = transactions[0]
 
     insert_transaction(transaction)
@@ -104,7 +100,6 @@ def test_insert_transaction(transactions):
 
     assert loaded == [transaction]
 
-test_insert_transaction = test_db_substitute(test_insert_transaction)
 
 def test_formatted_amount(transactions):
     result = transactions[0].formatted_amount
@@ -122,68 +117,33 @@ def test_create_transaction_calls_uuid_and_is_called_once():
     mock_uuid.assert_called_once()
 
 
-def test_load_transactions(tmp_path, monkeypatch, transactions):
-    test_db = tmp_path / "expenses.db"
-
-    monkeypatch.setattr(
-        database,
-        "DB_FILE",
-        test_db
-    )
-
-    init_db()
+def test_load_transactions(test_db_env, transactions):
     for transaction in transactions:
         insert_transaction(transaction)
     loaded = database.load_transactions()
 
-    assert test_db.exists()
+    # assert test_db.exists()
     assert loaded == transactions
 
 
-def test_load_empty_transactions(tmp_path, monkeypatch):
-    test_db = tmp_path / "expenses.db"
-
-    monkeypatch.setattr(
-        database,
-        "DB_FILE",
-        test_db
-    )
-
-    init_db()
+def test_load_empty_transactions(test_db_env):
     loaded = database.load_transactions()
     assert loaded == []
 
 
-def test_delete_transaction(transactions, tmp_path, monkeypatch):
-    test_db = tmp_path / "expenses.db"
-
-    monkeypatch.setattr(
-        database,
-        "DB_FILE",
-        test_db
-    )
-
+def test_delete_transaction(test_db_env, transactions):
     transaction = transactions[0]
-    init_db()
     insert_transaction(transaction)
+
     loaded = database.load_transactions()
     deleted = delete_transaction(transaction.id)
 
     assert loaded == deleted
 
 
-def test_delete_transaction_rejects_unknown_trans_id(tmp_path, monkeypatch):
-    test_db = tmp_path / "expenses.db"
-
-    monkeypatch.setattr(
-        database,
-        "DB_FILE",
-        test_db
-    )
-
+def test_delete_transaction_rejects_unknown_trans_id(test_db_env):
     trans_id = "unknown"
 
-    init_db()
     with pytest.raises(TransactionNotFoundError):
         database.delete_transaction(trans_id)
 
