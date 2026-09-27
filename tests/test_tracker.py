@@ -60,7 +60,7 @@ def example_tracker(transactions):
 
 
 @pytest.fixture
-def test_db_env(tmp_path, monkeypatch):
+def test_db(tmp_path, monkeypatch):
     test_db = tmp_path / "expenses.db"
 
     monkeypatch.setattr(
@@ -70,6 +70,8 @@ def test_db_env(tmp_path, monkeypatch):
     )
 
     init_db()
+
+    return test_db
 
 
 # =====================================================TESTS===========================================================
@@ -92,7 +94,7 @@ def test_create_transaction():
     assert transaction.note == "Lunch"
 
 
-def test_insert_transaction(test_db_env, transactions):
+def test_insert_transaction(test_db, transactions):
     transaction = transactions[0]
 
     insert_transaction(transaction)
@@ -117,21 +119,21 @@ def test_create_transaction_calls_uuid_and_is_called_once():
     mock_uuid.assert_called_once()
 
 
-def test_load_transactions(test_db_env, transactions):
+def test_load_transactions(test_db, transactions):
     for transaction in transactions:
         insert_transaction(transaction)
     loaded = database.load_transactions()
 
-    # assert test_db.exists()
+    assert test_db.exists()
     assert loaded == transactions
 
 
-def test_load_empty_transactions(test_db_env):
+def test_load_empty_transactions(test_db):
     loaded = database.load_transactions()
     assert loaded == []
 
 
-def test_delete_transaction(test_db_env, transactions):
+def test_delete_transaction(test_db, transactions):
     transaction = transactions[0]
     insert_transaction(transaction)
 
@@ -141,7 +143,7 @@ def test_delete_transaction(test_db_env, transactions):
     assert loaded == deleted
 
 
-def test_delete_transaction_rejects_unknown_trans_id(test_db_env):
+def test_delete_transaction_rejects_unknown_trans_id(test_db):
     trans_id = "unknown"
 
     with pytest.raises(TransactionNotFoundError):
