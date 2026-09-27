@@ -19,7 +19,8 @@ from tracker import (
 from database import (
     init_db,
     insert_transaction,
-    delete_transaction
+    delete_transaction,
+    update_transaction
 )
 from unittest.mock import patch
 
@@ -131,6 +132,33 @@ def test_load_transactions(test_db, transactions):
 def test_load_empty_transactions(test_db):
     loaded = database.load_transactions()
     assert loaded == []
+
+
+def test_update_transaction(test_db, transactions):
+    transaction = transactions[0]
+    insert_transaction(transaction)
+
+    updated = update_transaction(
+        transaction_id="1",
+        amount=7777,
+        category="books",
+    )
+
+    stored = database.load_transactions()[0]
+
+    assert updated.amount == 7777
+    assert updated.category == "books"
+
+    assert updated.id == transaction.id
+    assert updated.date == transaction.date
+    assert updated.note == transaction.note
+
+    assert stored == updated
+
+
+def test_update_transaction_raises_nonexist_err(test_db):
+    with pytest.raises(TransactionNotFoundError):
+        update_transaction("5555")
 
 
 def test_delete_transaction(test_db, transactions):
