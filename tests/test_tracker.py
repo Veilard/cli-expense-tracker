@@ -60,7 +60,7 @@ def example_tracker(transactions):
 
 
 def test_db_substitute(func):
-    def wrapper(tmp_path, monkeypatch, *args, **kwargs):
+    def wrapper(tmp_path, monkeypatch, transactions):
         test_db = tmp_path / "expenses.db"
 
         monkeypatch.setattr(
@@ -71,7 +71,7 @@ def test_db_substitute(func):
 
         init_db()
 
-        result = func(*args, **kwargs)
+        result = func(transactions)
         return result
     return wrapper
 
@@ -95,21 +95,16 @@ def test_create_transaction(transactions):
     assert transaction.category == "food"
     assert transaction.note == "Lunch"
 
-@test_db_substitute
-def test_insert_transaction():
-    transaction = Transaction(
-            id="1",
-            date="2026-09-10T12:00:00",
-            amount=5000,
-            category="food",
-            note="Lunch"
-        )
+
+def test_insert_transaction(transactions):
+    transaction = transactions[0]
 
     insert_transaction(transaction)
     loaded = database.load_transactions()
 
     assert loaded == [transaction]
 
+test_insert_transaction = test_db_substitute(test_insert_transaction)
 
 def test_formatted_amount(transactions):
     result = transactions[0].formatted_amount
