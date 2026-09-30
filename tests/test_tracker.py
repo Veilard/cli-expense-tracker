@@ -275,4 +275,10 @@ def test_replace_transaction(test_db, transactions):
 
 
 def test_replace_transaction_rollback(test_db, transactions):
-    pass
+    insert_transactions_batch(transactions)
+    new_trans = transactions[1]
+
+    with pytest.raises(sqlite3.IntegrityError):
+        replace_transaction(transactions[0].id, new_trans)
+
+    assert database.load_transactions() == transactions
