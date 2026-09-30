@@ -146,3 +146,14 @@ def delete_transaction(transaction_id: str) -> list[Transaction]:
         )
 
         return [Transaction(*row)]
+
+
+def clear_transactions(user_answer: str) -> None:
+    if user_answer == 'Yes':
+        with sqlite3.connect(DB_FILE) as connection:
+            connection.execute(
+                """
+                DELETE FROM transactions
+                """
+            )
+        print("ALL transactions are deleted")

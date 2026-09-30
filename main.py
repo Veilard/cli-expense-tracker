@@ -13,7 +13,8 @@ from database import (
     init_db,
     insert_transaction,
     load_transactions,
-    delete_transaction as delete_transaction_db
+    delete_transaction as delete_transaction_db,
+    clear_transactions
 )
 
 parser = argparse.ArgumentParser(description="Track expense tracker")
@@ -33,6 +34,8 @@ list_parser.add_argument("--from_date", type=str)
 list_parser.add_argument("--to_date", type=str)
 
 summary_parser = subparser.add_parser("summary")
+
+clear_parser = subparser.add_parser("clear")
 
 if __name__ == '__main__':
     try:
@@ -70,11 +73,19 @@ if __name__ == '__main__':
 
             delete_transaction_db(removed_trans_id)
 
+        elif args.command == "clear":
+            user_answer = questionary.select(
+                "Are you sure you want to clear ALL transactions?",
+                choices=['Yes', 'No']
+            ).ask()
+
+            clear_transactions(user_answer)
+
         elif args.command == "list":
             transactions = filter_transactions(transactions, args.category, args.from_date, args.to_date)
             if not transactions:
                 print("No transactions found.")
-                
+
             for transaction in transactions:
                 print(
                     f"{transaction.date} || "
