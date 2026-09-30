@@ -187,7 +187,6 @@ def test_clear_transactions(test_db, transactions):
 
     clear_transactions()
 
-    assert len(database.load_transactions()) == 0
     assert database.load_transactions() == []
 
 
