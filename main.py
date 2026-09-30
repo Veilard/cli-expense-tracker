@@ -79,8 +79,11 @@ if __name__ == '__main__':
                 choices=['Yes', 'No']
             ).ask()
 
-            clear_transactions(user_answer)
-
+            if user_answer == 'Yes':
+                clear_transactions(user_answer)
+                clear_transactions()
+                print("ALL transactions are deleted")
+                
         elif args.command == "list":
             transactions = filter_transactions(transactions, args.category, args.from_date, args.to_date)
             if not transactions:

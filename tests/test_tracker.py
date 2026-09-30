@@ -20,7 +20,8 @@ from database import (
     init_db,
     insert_transaction,
     delete_transaction,
-    update_transaction
+    update_transaction,
+    clear_transactions
 )
 from unittest.mock import patch
 
@@ -176,6 +177,18 @@ def test_delete_transaction_rejects_unknown_trans_id(test_db):
 
     with pytest.raises(TransactionNotFoundError):
         database.delete_transaction(trans_id)
+
+
+def test_clear_transactions(test_db, transactions):
+    for transaction in transactions:
+        insert_transaction(transaction)
+
+    assert len(database.load_transactions()) == 3
+
+    clear_transactions()
+
+    assert len(database.load_transactions()) == 0
+    assert database.load_transactions() == []
 
 
 @pytest.mark.parametrize("amount", [-5000, 0])
