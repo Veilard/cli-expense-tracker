@@ -272,3 +272,7 @@ def test_replace_transaction(test_db, transactions):
         transactions[1].id,
         transactions[2].id,
     }
+
+
+def test_replace_transaction_rollback(test_db, transactions):
+    pass
