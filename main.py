@@ -79,7 +79,7 @@ if __name__ == '__main__':
                 delete_transaction_db(picked_transaction_id)
                 print(f"Deleted transaction {picked_transaction_id}")
             else:
-                picked_transaction = [trans for trans in load_transactions() if trans.id == picked_transaction_id][0]
+                picked_transaction = [match for match in matches if match.id == picked_transaction_id][0]
                 new_transaction = create_transaction(
                     amount=int(input("New amount: ") or picked_transaction.amount),
                     category=input("New category: ") or picked_transaction.category,

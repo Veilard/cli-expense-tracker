@@ -24,7 +24,8 @@ from database import (
     insert_transactions_batch,
     delete_transaction,
     update_transaction,
-    clear_transactions
+    clear_transactions,
+    replace_transaction
 )
 from unittest.mock import patch
 
@@ -185,7 +186,7 @@ def test_delete_transaction(test_db, transactions):
     loaded = database.load_transactions()
     deleted = delete_transaction(transaction.id)
 
-    assert loaded == deleted
+    assert loaded[0] == deleted
 
 
 def test_delete_transaction_rejects_unknown_trans_id(test_db):
@@ -253,3 +254,16 @@ def test_filter_transactions_from_date(transactions):
     assert len(result) == 2
     assert result[0].date == "2026-09-11T12:00:00"
     assert result[1].date == "2026-09-12T12:00:00"
+
+def test_replace_transaction(test_db, transactions):
+    old_trans_id = transactions[0].id
+    old_db = database.load_transactions()
+    new_trans = create_transaction(5000, 'food')
+
+    insert_transactions_batch(transactions)
+
+    replace_transaction(old_trans_id, new_trans)
+
+    new_db = database.load_transactions()
+
+    assert old_db != new_db

@@ -1,5 +1,4 @@
 import sqlite3
-from multiprocessing import connection
 from pathlib import Path
 from models import Transaction
 from exceptions import TransactionNotFoundError
@@ -96,23 +95,7 @@ def insert_transaction(transaction: Transaction) -> None:
 def insert_transactions_batch(transactions: list[Transaction]) -> None:
     with sqlite3.connect(DB_FILE) as connection:
         for transaction in transactions:
-            connection.execute(
-                """
-                INSERT INTO transactions (id,
-                                          date,
-                                          amount,
-                                          category,
-                                          note)
-                VALUES (?, ?, ?, ?, ?)
-                """,
-                (
-                    transaction.id,
-                    transaction.date,
-                    transaction.amount,
-                    transaction.category,
-                    transaction.note
-                )
-            )
+            _insert_transaction(connection, transaction)
 
 
 def replace_transaction(
@@ -189,31 +172,9 @@ def load_transactions() -> list[Transaction]:
         return [Transaction(*row) for row in rows]
 
 
-@log_call
-def delete_transaction(transaction_id: str) -> list[Transaction]:
+def delete_transaction(transaction_id: str) -> Transaction:
     with sqlite3.connect(DB_FILE) as connection:
-        row = connection.execute(
-            """
-            SELECT *
-            FROM transactions
-            WHERE id = ?
-            """,
-            (transaction_id,)
-        ).fetchone()
-
-        if not row:
-            raise TransactionNotFoundError(f"Transaction with id {transaction_id} does not exist")
-
-        connection.execute(
-            """
-            DELETE
-            FROM transactions
-            WHERE id = ?
-            """,
-            (transaction_id,)
-        )
-
-        return [Transaction(*row)]
+        return _delete_transaction(connection, transaction_id)
 
 
 def clear_transactions() -> None:
