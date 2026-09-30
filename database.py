@@ -1,10 +1,62 @@
 import sqlite3
+from multiprocessing import connection
 from pathlib import Path
 from models import Transaction
 from exceptions import TransactionNotFoundError
 from decorators import log_call
 
 DB_FILE = Path(__file__).resolve().parent / "expenses.db"
+
+
+def _insert_transaction(
+        connection: sqlite3.Connection,
+        transaction: Transaction
+) -> None:
+    connection.execute(
+        """
+        INSERT INTO transactions (id,
+                                  date,
+                                  amount,
+                                  category,
+                                  note)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        (
+            transaction.id,
+            transaction.date,
+            transaction.amount,
+            transaction.category,
+            transaction.note
+        )
+    )
+
+
+def _delete_transaction(
+        connection: sqlite3.Connection,
+        transaction_id: str
+) -> Transaction:
+    row = connection.execute(
+        """
+        SELECT *
+        FROM transactions
+        WHERE id = ?
+        """,
+        (transaction_id,)
+    ).fetchone()
+
+    if not row:
+        raise TransactionNotFoundError(f"Transaction with id {transaction_id} does not exist")
+
+    connection.execute(
+        """
+        DELETE
+        FROM transactions
+        WHERE id = ?
+        """,
+        (transaction_id,)
+    )
+
+    return Transaction(*row)
 
 
 def init_db() -> None:
@@ -38,23 +90,7 @@ def init_db() -> None:
 
 def insert_transaction(transaction: Transaction) -> None:
     with sqlite3.connect(DB_FILE) as connection:
-        connection.execute(
-            """
-            INSERT INTO transactions (id,
-                                      date,
-                                      amount,
-                                      category,
-                                      note)
-            VALUES (?, ?, ?, ?, ?)
-            """,
-            (
-                transaction.id,
-                transaction.date,
-                transaction.amount,
-                transaction.category,
-                transaction.note
-            )
-        )
+        _insert_transaction(connection, transaction)
 
 
 def insert_transactions_batch(transactions: list[Transaction]) -> None:
@@ -77,6 +113,13 @@ def insert_transactions_batch(transactions: list[Transaction]) -> None:
                     transaction.note
                 )
             )
+
+
+def replace_transaction(
+        transaction_id: str,
+        transaction: Transaction
+) -> Transaction:
+    pass
 
 
 def update_transaction(

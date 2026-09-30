@@ -14,7 +14,8 @@ from database import (
     insert_transaction,
     load_transactions,
     delete_transaction as delete_transaction_db,
-    clear_transactions
+    clear_transactions,
+    replace_transaction
 )
 
 parser = argparse.ArgumentParser(description="Track expense tracker")
@@ -37,6 +38,9 @@ summary_parser = subparser.add_parser("summary")
 
 clear_parser = subparser.add_parser("clear")
 
+replace_parser = subparser.add_parser("replace")
+replace_parser.add_argument("--category", type=str)
+
 if __name__ == '__main__':
     try:
         init_db()
@@ -53,9 +57,9 @@ if __name__ == '__main__':
                 .replace("_", " ")
             )
 
-        elif args.command == "delete":
+        elif args.command in ["replace", "delete"]:
             matches = find_transactions(transactions, args.category)
-            removed_trans_id = questionary.select(
+            picked_transaction_id = questionary.select(
                 "Select a transaction to remove",
                 choices=[
                     Choice(
@@ -71,7 +75,12 @@ if __name__ == '__main__':
                 ]
             ).ask()
 
-            delete_transaction_db(removed_trans_id)
+            if args.command == 'delete':
+                delete_transaction_db(picked_transaction_id)
+                print(f"Deleted transaction {picked_transaction_id}")
+            else:
+                replace_transaction(picked_transaction_id, None)
+                print(f"Replace completed. New transaction: {None}")
 
         elif args.command == "clear":
             user_answer = questionary.select(
