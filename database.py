@@ -57,6 +57,28 @@ def insert_transaction(transaction: Transaction) -> None:
         )
 
 
+def insert_transactions_batch(transactions: list[Transaction]) -> None:
+    with sqlite3.connect(DB_FILE) as connection:
+        for transaction in transactions:
+            connection.execute(
+                """
+                INSERT INTO transactions (id,
+                                          date,
+                                          amount,
+                                          category,
+                                          note)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (
+                    transaction.id,
+                    transaction.date,
+                    transaction.amount,
+                    transaction.category,
+                    transaction.note
+                )
+            )
+
+
 def update_transaction(
         transaction_id: str,
         amount: int | None = None,

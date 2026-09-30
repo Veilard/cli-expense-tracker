@@ -1,3 +1,5 @@
+import sqlite3
+
 import pytest
 from _pytest import monkeypatch
 
@@ -19,6 +21,7 @@ from tracker import (
 from database import (
     init_db,
     insert_transaction,
+    insert_transactions_batch,
     delete_transaction,
     update_transaction,
     clear_transactions
@@ -104,6 +107,19 @@ def test_insert_transaction(test_db, transactions):
 
     assert loaded == [transaction]
 
+
+def test_insert_transactions_batch(test_db, transactions):
+    insert_transactions_batch(transactions)
+
+    assert database.load_transactions() == transactions
+
+def test_insert_batch_raises_integrity_error(test_db, transactions):
+    transactions[2].id = "1"
+
+    with pytest.raises(sqlite3.IntegrityError):
+        insert_transactions_batch(transactions)
+
+    assert database.load_transactions() == []
 
 def test_formatted_amount(transactions):
     result = transactions[0].formatted_amount
