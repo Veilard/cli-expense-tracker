@@ -114,6 +114,7 @@ def test_insert_transactions_batch(test_db, transactions):
 
     assert database.load_transactions() == transactions
 
+
 def test_insert_batch_raises_integrity_error(test_db, transactions):
     transactions[2].id = "1"
 
@@ -121,6 +122,7 @@ def test_insert_batch_raises_integrity_error(test_db, transactions):
         insert_transactions_batch(transactions)
 
     assert database.load_transactions() == []
+
 
 def test_formatted_amount(transactions):
     result = transactions[0].formatted_amount
@@ -255,15 +257,18 @@ def test_filter_transactions_from_date(transactions):
     assert result[0].date == "2026-09-11T12:00:00"
     assert result[1].date == "2026-09-12T12:00:00"
 
+
 def test_replace_transaction(test_db, transactions):
     old_trans_id = transactions[0].id
-    old_db = database.load_transactions()
     new_trans = create_transaction(5000, 'food')
 
     insert_transactions_batch(transactions)
-
     replace_transaction(old_trans_id, new_trans)
 
-    new_db = database.load_transactions()
+    loaded_ids = {trans.id for trans in database.load_transactions()}
 
-    assert old_db != new_db
+    assert loaded_ids == {
+        new_trans.id,
+        transactions[1].id,
+        transactions[2].id,
+    }
