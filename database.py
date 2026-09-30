@@ -116,10 +116,13 @@ def insert_transactions_batch(transactions: list[Transaction]) -> None:
 
 
 def replace_transaction(
-        transaction_id: str,
-        transaction: Transaction
+        old_transaction_id: str,
+        new_transaction: Transaction
 ) -> Transaction:
-    pass
+    with sqlite3.connect(DB_FILE) as connection:
+        _delete_transaction(connection, old_transaction_id)
+        _insert_transaction(connection, new_transaction)
+        return new_transaction
 
 
 def update_transaction(

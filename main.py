@@ -39,7 +39,7 @@ summary_parser = subparser.add_parser("summary")
 clear_parser = subparser.add_parser("clear")
 
 replace_parser = subparser.add_parser("replace")
-replace_parser.add_argument("--category", type=str)
+replace_parser.add_argument("category", type=str)
 
 if __name__ == '__main__':
     try:
@@ -60,7 +60,7 @@ if __name__ == '__main__':
         elif args.command in ["replace", "delete"]:
             matches = find_transactions(transactions, args.category)
             picked_transaction_id = questionary.select(
-                "Select a transaction to remove",
+                "Select a transaction",
                 choices=[
                     Choice(
                         title=(
@@ -79,8 +79,15 @@ if __name__ == '__main__':
                 delete_transaction_db(picked_transaction_id)
                 print(f"Deleted transaction {picked_transaction_id}")
             else:
-                replace_transaction(picked_transaction_id, None)
-                print(f"Replace completed. New transaction: {None}")
+                picked_transaction = [trans for trans in load_transactions() if trans.id == picked_transaction_id][0]
+                new_transaction = create_transaction(
+                    amount=int(input("New amount: ") or picked_transaction.amount),
+                    category=input("New category: ") or picked_transaction.category,
+                    note=input("New note: ") or picked_transaction.note
+                )
+
+                replace_transaction(picked_transaction_id, new_transaction)
+                print(f"Replace completed. New transaction: {new_transaction.id}")
 
         elif args.command == "clear":
             user_answer = questionary.select(
