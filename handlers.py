@@ -22,6 +22,11 @@ from database import (
 def handle_add(args):
     transaction = create_transaction(args.amount, args.category, args.note)
     insert_transaction(transaction)
+    print(
+        "Transaction added: "
+        f"{transaction.category} — {transaction.amount:_} ₸"
+        .replace("_", " ")
+    )
 
 
 def handle_clear(args):
@@ -32,6 +37,7 @@ def handle_clear(args):
 
     if user_answer == 'Yes':
         clear_transactions()
+        print("ALL transactions are deleted")
 
 
 def handle_list(args):
@@ -83,6 +89,7 @@ def _pick_transaction(transactions, category):
 def handle_delete(args):
     picked_transaction = _pick_transaction(load_transactions(), args.category)
     delete_transaction_db(picked_transaction.id)
+    print(f"Deleted transaction {picked_transaction.id}")
 
 
 def handle_replace(args):
@@ -94,3 +101,4 @@ def handle_replace(args):
     )
 
     replace_transaction(picked_transaction.id, new_transaction)
+    print(f"Replace completed. New transaction: {new_transaction.id}")

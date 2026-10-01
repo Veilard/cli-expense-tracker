@@ -1,6 +1,5 @@
 import argparse
 import logging
-from logging import FileHandler
 
 from database import (
     init_db
@@ -52,9 +51,6 @@ def main():
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
-    logger = logging.getLogger(__name__)
-
-    # logger.info("App is starting...")
     try:
         init_db()
         args = parser.parse_args()
