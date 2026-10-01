@@ -51,11 +51,13 @@ def main():
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
+    logger = logging.getLogger(__name__)
     try:
         init_db()
         args = parser.parse_args()
         args.func(args)
     except (ValueError, OSError) as error:
+        logger.exception("Command execution failed")
         print(f"Error: {error}")
         raise SystemExit(1)
 
