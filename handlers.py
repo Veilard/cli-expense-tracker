@@ -42,11 +42,11 @@ def handle_clear(args):
 
 def handle_list(args):
     transactions = load_transactions()
+    transactions = filter_transactions(transactions, args.category, args.from_date, args.to_date)
+
     if not transactions:
         print("No transactions found.")
         return
-
-    transactions = filter_transactions(transactions, args.category, args.from_date, args.to_date)
 
     for transaction in transactions:
         print(
@@ -65,10 +65,9 @@ def handle_summary(args):
     print(f"Total: {calculate_total(transactions):_} ₸.".replace("_", " "))
 
 
-def handle_delete_replace(args):
-    transactions = load_transactions()
+def _pick_transaction(transactions, args):
     matches = find_transactions(transactions, args.category)
-    picked_transaction_id = questionary.select(
+    picked_transaction = questionary.select(
         "Select a transaction",
         choices=[
             Choice(
@@ -78,22 +77,28 @@ def handle_delete_replace(args):
                     f"{match.amount:_} ₸ | "
                     f"{match.note or ''}"
                 ).replace("_", " "),
-                value=match.id,
+                value=match,
             )
             for match in matches
         ]
     ).ask()
 
-    if args.command == 'delete':
-        delete_transaction_db(picked_transaction_id)
-        print(f"Deleted transaction {picked_transaction_id}")
-    else:
-        picked_transaction = [match for match in matches if match.id == picked_transaction_id][0]
-        new_transaction = create_transaction(
-            amount=int(input("New amount: ") or picked_transaction.amount),
-            category=input("New category: ") or picked_transaction.category,
-            note=input("New note: ") or picked_transaction.note
-        )
+    return picked_transaction
 
-        replace_transaction(picked_transaction_id, new_transaction)
-        print(f"Replace completed. New transaction: {new_transaction.id}")
+
+def handle_delete(args):
+    picked_transaction = _pick_transaction(load_transactions(), args)
+    delete_transaction_db(picked_transaction.id)
+    print(f"Deleted transaction {picked_transaction.id}")
+
+
+def handle_replace(args):
+    picked_transaction = _pick_transaction(load_transactions(), args)
+    new_transaction = create_transaction(
+        amount=int(input("New amount: ") or picked_transaction.amount),
+        category=input("New category: ") or picked_transaction.category,
+        note=input("New note: ") or picked_transaction.note
+    )
+
+    replace_transaction(picked_transaction.id, new_transaction)
+    print(f"Replace completed. New transaction: {new_transaction.id}")

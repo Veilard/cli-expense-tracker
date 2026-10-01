@@ -8,7 +8,8 @@ from handlers import (
     handle_add,
     handle_list,
     handle_clear,
-    handle_delete_replace,
+    handle_delete,
+    handle_replace,
     handle_summary
 )
 
@@ -23,7 +24,7 @@ add_parser.set_defaults(func=handle_add)
 
 delete_parser = subparser.add_parser("delete")
 delete_parser.add_argument("category", type=str)
-delete_parser.set_defaults(func=handle_delete_replace)
+delete_parser.set_defaults(func=handle_delete)
 
 list_parser = subparser.add_parser("list")
 list_parser.add_argument("--category", type=str)
@@ -39,7 +40,7 @@ clear_parser.set_defaults(func=handle_clear)
 
 replace_parser = subparser.add_parser("replace")
 replace_parser.add_argument("category", type=str)
-replace_parser.set_defaults(func=handle_delete_replace)
+replace_parser.set_defaults(func=handle_replace)
 
 if __name__ == '__main__':
     try:
