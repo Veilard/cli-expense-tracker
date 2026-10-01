@@ -1,10 +1,12 @@
 import sqlite3
+import logging
+
 from pathlib import Path
 from models import Transaction
 from exceptions import TransactionNotFoundError
-from decorators import log_call
 
 DB_FILE = Path(__file__).resolve().parent / "expenses.db"
+logger = logging.getLogger(__name__)
 
 
 def _insert_transaction(
@@ -90,6 +92,10 @@ def init_db() -> None:
 def insert_transaction(transaction: Transaction) -> None:
     with sqlite3.connect(DB_FILE) as connection:
         _insert_transaction(connection, transaction)
+    logger.info(
+        "Transaction inserted: id=%s",
+        transaction.id
+    )
 
 
 def insert_transactions_batch(transactions: list[Transaction]) -> None:
@@ -105,7 +111,11 @@ def replace_transaction(
     with sqlite3.connect(DB_FILE) as connection:
         _delete_transaction(connection, old_transaction_id)
         _insert_transaction(connection, new_transaction)
-        return new_transaction
+    logger.info(
+        "Transaction id=%s replaced. New transaction id=%s",
+        old_transaction_id, new_transaction.id
+    )
+    return new_transaction
 
 
 def update_transaction(
@@ -168,19 +178,25 @@ def load_transactions() -> list[Transaction]:
             FROM transactions
             """
         ).fetchall()
-
-        return [Transaction(*row) for row in rows]
+    return [Transaction(*row) for row in rows]
 
 
 def delete_transaction(transaction_id: str) -> Transaction:
     with sqlite3.connect(DB_FILE) as connection:
-        return _delete_transaction(connection, transaction_id)
+        deleted_transaction = _delete_transaction(connection, transaction_id)
+    logger.info(
+        "Transaction deleted: id=%s",
+        deleted_transaction.id
+    )
+    return deleted_transaction
 
 
 def clear_transactions() -> None:
     with sqlite3.connect(DB_FILE) as connection:
         connection.execute(
             """
-            DELETE FROM transactions
+            DELETE
+            FROM transactions
             """
         )
+    logger.info("ALL transactions are deleted")

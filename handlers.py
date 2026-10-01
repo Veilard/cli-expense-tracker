@@ -22,11 +22,6 @@ from database import (
 def handle_add(args):
     transaction = create_transaction(args.amount, args.category, args.note)
     insert_transaction(transaction)
-    print(
-        "Transaction added: "
-        f"{transaction.category} — {transaction.amount:_} ₸"
-        .replace("_", " ")
-    )
 
 
 def handle_clear(args):
@@ -37,7 +32,6 @@ def handle_clear(args):
 
     if user_answer == 'Yes':
         clear_transactions()
-        print("ALL transactions are deleted")
 
 
 def handle_list(args):
@@ -65,8 +59,8 @@ def handle_summary(args):
     print(f"Total: {calculate_total(transactions):_} ₸.".replace("_", " "))
 
 
-def _pick_transaction(transactions, args):
-    matches = find_transactions(transactions, args.category)
+def _pick_transaction(transactions, category):
+    matches = find_transactions(transactions, category)
     picked_transaction = questionary.select(
         "Select a transaction",
         choices=[
@@ -87,13 +81,12 @@ def _pick_transaction(transactions, args):
 
 
 def handle_delete(args):
-    picked_transaction = _pick_transaction(load_transactions(), args)
+    picked_transaction = _pick_transaction(load_transactions(), args.category)
     delete_transaction_db(picked_transaction.id)
-    print(f"Deleted transaction {picked_transaction.id}")
 
 
 def handle_replace(args):
-    picked_transaction = _pick_transaction(load_transactions(), args)
+    picked_transaction = _pick_transaction(load_transactions(), args.category)
     new_transaction = create_transaction(
         amount=int(input("New amount: ") or picked_transaction.amount),
         category=input("New category: ") or picked_transaction.category,
@@ -101,4 +94,3 @@ def handle_replace(args):
     )
 
     replace_transaction(picked_transaction.id, new_transaction)
-    print(f"Replace completed. New transaction: {new_transaction.id}")

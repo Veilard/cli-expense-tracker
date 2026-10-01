@@ -1,4 +1,6 @@
 import argparse
+import logging
+from logging import FileHandler
 
 from database import (
     init_db
@@ -42,7 +44,17 @@ replace_parser = subparser.add_parser("replace")
 replace_parser.add_argument("category", type=str)
 replace_parser.set_defaults(func=handle_replace)
 
-if __name__ == '__main__':
+
+def main():
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
+    logger = logging.getLogger(__name__)
+
+    # logger.info("App is starting...")
     try:
         init_db()
         args = parser.parse_args()
@@ -50,3 +62,7 @@ if __name__ == '__main__':
     except (ValueError, OSError) as error:
         print(f"Error: {error}")
         raise SystemExit(1)
+
+
+if __name__ == '__main__':
+    main()
