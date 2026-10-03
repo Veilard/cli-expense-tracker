@@ -8,3 +8,9 @@ class TransactionResponse(BaseModel):
     note: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class TransactionCreate(BaseModel):
+    amount: int
+    category: str
+    note: str | None = None
