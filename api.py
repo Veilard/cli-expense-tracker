@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+
 from schemas import (
     TransactionResponse,
     TransactionCreate
@@ -16,7 +17,7 @@ app = FastAPI()
 
 @app.get("/health")
 def health():
-    return load_transactions()
+    return {"status": "ok"}
 
 
 @app.get(
@@ -29,9 +30,9 @@ def get_transactions():
 
 @app.post(
     "/transactions",
-    response_model=list[TransactionResponse]
+    response_model=TransactionResponse
 )
 def create_transaction_endpoint(data: TransactionCreate):
     transaction = create_transaction(data.amount, data.category, data.note)
     insert_transaction(transaction)
-    return load_transactions()
+    return transaction
