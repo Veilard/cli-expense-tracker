@@ -1,3 +1,5 @@
+from datetime import date
+
 from fastapi import (
     FastAPI,
     HTTPException
@@ -30,27 +32,22 @@ def health():
     "/transactions",
     response_model=list[TransactionResponse]
 )
-def get_transactions():
-    return load_transactions()
-
-
-from fastapi import HTTPException
-
-
-@app.get(
-    "/transactions/category/{category}",
-    response_model=list[TransactionResponse]
-)
-def filter_transactions_endpoint(category: str):
+def filter_transactions_endpoint(
+        category: str | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None
+):
     result = filter_transactions(
         load_transactions(),
-        category=category
+        category,
+        from_date,
+        to_date
     )
 
     if not result:
         raise HTTPException(
             status_code=404,
-            detail=f"No transactions found for category '{category}'"
+            detail="No transactions found"
         )
 
     return result
