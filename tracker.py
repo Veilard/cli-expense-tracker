@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, date
 from models import Transaction
 from exceptions import TransactionNotFoundError
 
@@ -39,8 +39,8 @@ def find_transactions(
 def filter_transactions(
         transactions: list[Transaction],
         category: str | None = None,
-        from_date: str | None = None,
-        to_date: str | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
 ) -> list[Transaction]:
     if category:
         category = category.strip().lower()
@@ -52,8 +52,6 @@ def filter_transactions(
         ]
 
     if from_date:
-        from_date = datetime.strptime(from_date, "%Y-%m-%d").date()
-
         transactions = [
             transaction
             for transaction in transactions
@@ -61,8 +59,6 @@ def filter_transactions(
         ]
 
     if to_date:
-        to_date = datetime.strptime(to_date, "%Y-%m-%d").date()
-
         transactions = [
             transaction
             for transaction in transactions
