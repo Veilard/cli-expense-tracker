@@ -5,14 +5,16 @@ from fastapi import (
     HTTPException
 )
 
+from exceptions import TransactionNotFoundError
 from schemas import (
     TransactionResponse,
-    TransactionCreate
+    TransactionCreate,
+    TransactionUpdate
 )
 
 from database import (
     load_transactions,
-    insert_transaction, delete_transaction
+    insert_transaction, delete_transaction, update_transaction
 )
 
 from tracker import (
@@ -64,14 +66,31 @@ def create_transaction_endpoint(data: TransactionCreate):
     return transaction
 
 
+@app.patch(
+    "/transactions/{transaction_id}",
+    response_model=TransactionResponse
+)
+def update_transaction_endpoint(data: TransactionUpdate, transaction_id: str):
+    try:
+        data = data.model_dump(exclude_unset=True)
+        result = update_transaction(transaction_id, data['amount'], data['category'], data['note'])
+        return result
+    except TransactionNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="Transaction not found"
+        )
+
+
 @app.delete(
     "/transactions/{transaction_id}",
     status_code=204
 )
 def delete_transaction_endpoint(transaction_id: str):
-    result = delete_transaction(transaction_id)
+    try:
+        delete_transaction(transaction_id)
 
-    if not result:
+    except TransactionNotFoundError:
         raise HTTPException(
             status_code=404,
             detail="Transaction not found"
