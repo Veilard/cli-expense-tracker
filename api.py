@@ -12,7 +12,7 @@ from schemas import (
 
 from database import (
     load_transactions,
-    insert_transaction
+    insert_transaction, delete_transaction
 )
 
 from tracker import (
@@ -55,9 +55,24 @@ def filter_transactions_endpoint(
 
 @app.post(
     "/transactions",
-    response_model=TransactionResponse
+    response_model=TransactionResponse,
+    status_code=201
 )
 def create_transaction_endpoint(data: TransactionCreate):
     transaction = create_transaction(data.amount, data.category, data.note)
     insert_transaction(transaction)
     return transaction
+
+
+@app.delete(
+    "/transactions/{transaction_id}",
+    status_code=204
+)
+def delete_transaction_endpoint(transaction_id: str):
+    result = delete_transaction(transaction_id)
+
+    if not result:
+        raise HTTPException(
+            status_code=404,
+            detail="Transaction not found"
+        )
