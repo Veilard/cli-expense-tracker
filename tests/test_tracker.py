@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import date
 
 import pytest
 from _pytest import monkeypatch
@@ -250,7 +251,7 @@ def test_filter_transactions_by_category(transactions):
 def test_filter_transactions_from_date(transactions):
     result = filter_transactions(
         transactions,
-        from_date="2026-09-11"
+        from_date=date(2026, 9, 11)
     )
 
     assert len(result) == 2

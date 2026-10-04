@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import questionary
 
 from questionary import Choice
@@ -42,6 +44,9 @@ def handle_clear(args):
 
 def handle_list(args):
     transactions = load_transactions()
+
+    args.from_date = datetime.strptime(args.from_date or None, "%Y-%m-%d").date() if args.from_date else None
+    args.to_date = datetime.strptime(args.to_date, "%Y-%m-%d").date() if args.to_date else None
     transactions = filter_transactions(transactions, args.category, args.from_date, args.to_date)
 
     if not transactions:
