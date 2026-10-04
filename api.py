@@ -72,8 +72,8 @@ def create_transaction_endpoint(data: TransactionCreate):
 )
 def update_transaction_endpoint(data: TransactionUpdate, transaction_id: str):
     try:
-        data = data.model_dump(exclude_unset=True)
-        result = update_transaction(transaction_id, data['amount'], data['category'], data['note'])
+        changes = data.model_dump(exclude_unset=True)
+        result = update_transaction(transaction_id, **changes)
         return result
     except TransactionNotFoundError:
         raise HTTPException(

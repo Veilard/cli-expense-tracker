@@ -8,6 +8,8 @@ from exceptions import TransactionNotFoundError
 DB_FILE = Path(__file__).resolve().parent / "expenses.db"
 logger = logging.getLogger(__name__)
 
+UNSET = object()
+
 
 def _insert_transaction(
         connection: sqlite3.Connection,
@@ -120,9 +122,9 @@ def replace_transaction(
 
 def update_transaction(
         transaction_id: str,
-        amount: int | None = None,
-        category: str | None = None,
-        note: str | None = None
+        amount: int | None = UNSET,
+        category: str | None = UNSET,
+        note: str | None = UNSET
 ) -> Transaction:
     with sqlite3.connect(DB_FILE) as connection:
         row = connection.execute(
@@ -139,9 +141,20 @@ def update_transaction(
 
         old_transaction = Transaction(*row)
 
-        new_amount = amount if amount is not None else old_transaction.amount
-        new_category = category if category is not None else old_transaction.category
-        new_note = note if note is not None else old_transaction.note
+        def converter(new_value, old_value):
+            if new_value is UNSET:
+                return old_value
+            return new_value
+
+        new_amount, new_category, new_note = map(
+            converter,
+            [amount, category, note],
+            [
+                old_transaction.amount,
+                old_transaction.category,
+                old_transaction.note,
+            ],
+        )
 
         updated_transaction = Transaction(
             old_transaction.id,
